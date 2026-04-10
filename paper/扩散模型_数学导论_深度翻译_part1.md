@@ -26,6 +26,7 @@
    - 3.2 [逆过程与真实后验（DDPM 后验）](#32-逆过程与真实后验ddpm-后验)
    - 3.3 [损失函数](#33-损失函数)
    - 3.4 [计算 p_θ(x_0)](#34-计算-p_θx_0)
+   - 3.6 [补充证明：变分下界推导全解析](#36-补充证明变分下界推导全解析)
 4. [加速方法](#4-加速方法)
    - 4.1 [去噪扩散隐式模型（DDIM）](#41-去噪扩散隐式模型ddim)
    - 4.2 [DDGAN：对抗学习的逆动力学](#42-ddgan对抗学习的逆动力学)
@@ -375,23 +376,57 @@ $$p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)\,p_\theta(\mathbf{x}_0) = p_\thet
 
 虽然这看起来是反因果的，但恒等式在代数上成立。我们的目标是通过非负的 KL 散度使 $q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)$ 和 $p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)$ 接近：
 
-$$0 \leq \text{KL}\big(q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) \,\|\, p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)\big)$$
+$$0 \leq \text{KL}\big(q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) \,\|\, p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)\big) = \mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)} \log \frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}$$
 
-化简后得到：
+**化简期望**。利用 $p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0) = p_\theta(\mathbf{x}_{0:T}) / p_\theta(\mathbf{x}_0)$，逐步展开：
+
+$$\text{KL}\big(q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) \,\|\, p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)\big) = \mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)} \log \frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}$$
+
+$$= \mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)} \log \frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)\,p_\theta(\mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})}$$
+
+$$= \mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)} \log \frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} + \mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)} \log p_\theta(\mathbf{x}_0)$$
+
+由于 $\log p_\theta(\mathbf{x}_0)$ 不依赖于 $\mathbf{x}_{1:T}$，所以：
+
+$$\mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)} \log p_\theta(\mathbf{x}_0) = \log p_\theta(\mathbf{x}_0)$$
+
+因此：
 
 $$\text{KL}\big(q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) \,\|\, p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)\big) = \mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)}\log\frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} + \log p_\theta(\mathbf{x}_0) \geq 0$$
 
 $$\implies \mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)}\log\frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \geq -\log p_\theta(\mathbf{x}_0)$$
 
-对 $q(\mathbf{x}_0)$ 取期望后，右侧与 $\text{KL}(q(\mathbf{x}_0)\|p_\theta(\mathbf{x}_0)) = \text{const} - \mathbb{E}_{q(\mathbf{x}_0)}\log p_\theta(\mathbf{x}_0)$ 相关。由于 $\log p_\theta(\mathbf{x}_0)$ 难以计算，我们转而最小化左侧的**变分下界（VB）**（与 VAE 中的证据下界 ELBO 密切相关）。
+对 $q(\mathbf{x}_0)$ 取期望：
 
-展开 VB 并应用贝叶斯定理，经过一系列化简（包含伸缩求和）后得到：
+$$\mathbb{E}_{q(\mathbf{x}_{0:T})}\log\frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \geq -\mathbb{E}_{q(\mathbf{x}_0)}\log p_\theta(\mathbf{x}_0)$$
+
+右侧与 $\text{KL}(q(\mathbf{x}_0)\|p_\theta(\mathbf{x}_0)) = \text{const} - \mathbb{E}_{q(\mathbf{x}_0)}\log p_\theta(\mathbf{x}_0)$ 相关，这是我们希望最小化的量，但 $\log p_\theta(\mathbf{x}_0)$ 难以计算。因此我们转而最小化左侧的**变分界（VB）**（与 VAE 中的证据下界 ELBO 密切相关）。
+
+**展开 VB**。将前向和逆向的马尔可夫分解代入：
+
+$$\mathbb{E}_{q(\mathbf{x}_{0:T})}\log\frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} = \mathbb{E}_{q(\mathbf{x}_{0:T})}\log\frac{q(\mathbf{x}_T \mid \mathbf{x}_{T-1})\cdots q(\mathbf{x}_2 \mid \mathbf{x}_1)\,q(\mathbf{x}_1 \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)\cdots p_\theta(\mathbf{x}_{T-1} \mid \mathbf{x}_T)\,p_\theta(\mathbf{x}_T)}$$
+
+$$= \mathbb{E}_{q(\mathbf{x}_{0:T})}\log\frac{q(\mathbf{x}_1 \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)} - \mathbb{E}_{q(\mathbf{x}_{0:T})}\log p_\theta(\mathbf{x}_T) + \mathbb{E}_{q(\mathbf{x}_{0:T})}\sum_{t=2}^{T}\log\frac{q(\mathbf{x}_t \mid \mathbf{x}_{t-1})}{p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)}$$
+
+由于前向过程是马尔可夫的，$q(\mathbf{x}_t \mid \mathbf{x}_{t-1}) = q(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{x}_0)$，故上式等价于：
+
+$$= \mathbb{E}_{q(\mathbf{x}_{0:T})}\log\frac{q(\mathbf{x}_1 \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)} - \mathbb{E}_{q(\mathbf{x}_{0:T})}\log p_\theta(\mathbf{x}_T) + \mathbb{E}_{q(\mathbf{x}_{0:T})}\sum_{t=2}^{T}\log\frac{q(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)}$$
+
+**应用贝叶斯定理**。对前向转移应用贝叶斯定理 $q(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{x}_0) = \frac{q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)\,q(\mathbf{x}_t \mid \mathbf{x}_0)}{q(\mathbf{x}_{t-1} \mid \mathbf{x}_0)}$，代入得：
+
+$$\text{VB} = \mathbb{E}_{q(\mathbf{x}_{0:T})}\log\frac{q(\mathbf{x}_1 \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)} - \mathbb{E}_{q(\mathbf{x}_{0:T})}\log p_\theta(\mathbf{x}_T) + \mathbb{E}_{q(\mathbf{x}_{0:T})}\sum_{t=2}^{T}\log\frac{q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)} + \mathbb{E}_{q(\mathbf{x}_{0:T})}\sum_{t=2}^{T}\log\frac{q(\mathbf{x}_t \mid \mathbf{x}_0)}{q(\mathbf{x}_{t-1} \mid \mathbf{x}_0)}$$
+
+**伸缩求和化简**。最后一项是伸缩和（telescoping sum）：
+
+$$\mathbb{E}_{q(\mathbf{x}_{0:T})}\sum_{t=2}^{T}\log\frac{q(\mathbf{x}_t \mid \mathbf{x}_0)}{q(\mathbf{x}_{t-1} \mid \mathbf{x}_0)} = \mathbb{E}_{q(\mathbf{x}_{0:T})}\log\frac{q(\mathbf{x}_T \mid \mathbf{x}_0)}{q(\mathbf{x}_1 \mid \mathbf{x}_0)}$$
+
+将此与第一项 $\log\frac{q(\mathbf{x}_1 \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)}$ 和 $-\log p_\theta(\mathbf{x}_T)$ 合并，$q(\mathbf{x}_1 \mid \mathbf{x}_0)$ 消去，得到最终的**三项分解**：
 
 $$\text{VB} = \underbrace{\mathbb{E}_{q(\mathbf{x}_{0:T})}\log\frac{q(\mathbf{x}_T \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_T)}}_{\textcircled{I}} - \underbrace{\mathbb{E}_{q(\mathbf{x}_{0:T})}\log p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)}_{\textcircled{II}} + \underbrace{\mathbb{E}_{q(\mathbf{x}_{0:T})}\sum_{t=2}^{T}\log\frac{q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)}}_{\textcircled{III}}$$
 
-- **$\textcircled{I}$**：当 $q(\mathbf{x}_T \mid \mathbf{x}_0) = p_\theta(\mathbf{x}_T)$ 时为 0；否则当 $p_\theta(\mathbf{x}_T) = \mathcal{N}(\mathbf{0},\mathbf{I})$ 且 $T$ 足够大时为一个小常数。
-- **$\textcircled{II}$**：$\mathbb{E}_{q(\mathbf{x}_{0:T})}\log p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)$ 在实践中通常被忽略（充当 $t{=}1$ 的解码器项）。
-- **$\textcircled{III}$**：归结为各向同性高斯之间 KL 散度之和（封闭形式）。
+- **$\textcircled{I}$**：$\mathbb{E}_{q(\mathbf{x}_{0:T})}\log\frac{q(\mathbf{x}_T \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_T)}$——当 $q(\mathbf{x}_T \mid \mathbf{x}_0) = p_\theta(\mathbf{x}_T)$ 时为 0；否则当 $p_\theta(\mathbf{x}_T) = \mathcal{N}(\mathbf{0},\mathbf{I})$ 且 $T$ 足够大时为一个小常数。
+- **$\textcircled{II}$**：$\mathbb{E}_{q(\mathbf{x}_{0:T})}\log p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)$——在实践中通常被忽略（充当 $t{=}1$ 的解码器项）。
+- **$\textcircled{III}$**：$\mathbb{E}_{q(\mathbf{x}_{0:T})}\sum_{t=2}^{T}\log\frac{q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)}$——归结为各向同性高斯之间 KL 散度之和（封闭形式）。
 
 因此优化鼓励 $p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$ 去匹配 $q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)$，对 $t = 2,\ldots,T$：
 
@@ -407,7 +442,13 @@ $$\text{VB} = \mathbb{E}_{q(\mathbf{x}_{0:T})}\sum_{t=2}^{T}\log\frac{q(\mathbf{
 
 $$\text{KL}\big\{q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0) \,\|\, p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)\big\} = \frac{1}{2\sigma_t^2}\Big\|\frac{1}{\sqrt{1-\beta_t}}\big(\mathbf{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\boldsymbol{\epsilon}_t\big) - \mu_\theta(\mathbf{x}_t, t)\Big\|_2^2$$
 
-利用参数化 $\mu_\theta(\mathbf{x}_t, t) = \frac{1}{\sqrt{\alpha_t}}\big(\mathbf{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\hat{\boldsymbol{\epsilon}}_t\big)$，得到简单的加权噪声匹配目标：
+$$= \frac{1-\bar{\alpha}_t}{2\beta_t(1-\bar{\alpha}_{t-1})}\Big\|\frac{1}{\sqrt{1-\beta_t}}\big(\mathbf{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\boldsymbol{\epsilon}_t\big) - \mu_\theta(\mathbf{x}_t, t)\Big\|_2^2$$
+
+利用参数化 [6]：
+
+$$\mu_\theta(\mathbf{x}_t, t) = \frac{1}{\sqrt{\alpha_t}}\Big(\mathbf{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\hat{\boldsymbol{\epsilon}}_t\Big)$$
+
+得到简单的加权噪声匹配目标：
 
 $$\text{KL}\big\{q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0) \,\|\, p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)\big\} = \frac{\beta_t}{2(1-\beta_t)(1-\bar{\alpha}_{t-1})}\|\boldsymbol{\epsilon}_t - \hat{\boldsymbol{\epsilon}}_t\|_2^2 \tag{Eq.3-2}$$
 
@@ -434,6 +475,303 @@ $$p_\theta(\mathbf{x}_0) = \mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)}\bigg[p_
 实际使用的逆时间条件分布为：
 
 $$p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t) = \mathcal{N}\bigg(\mathbf{x}_{t-1};\, \frac{1}{\sqrt{\alpha_t}}\Big(\mathbf{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\hat{\boldsymbol{\epsilon}}_t\Big),\, \frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}\beta_t\,\mathbf{I}\bigg)$$
+
+### 3.5 补充说明：计算 $p_\theta(\mathbf{x}_0)$ 的公式推导详细解读
+
+这部分是**扩散模型（Diffusion Model）**中，从完整反向路径的联合概率，推导初始样本 $\mathbf{x}_0$ 的边缘概率 $p_\theta(\mathbf{x}_0)$ 的核心过程，本质是用**重要性采样（Importance Sampling）**解决高维积分的计算难题。下面我们逐行拆解每一步的逻辑、原理和意义。
+
+---
+
+#### 一、背景铺垫：扩散模型的反向马尔可夫链
+
+扩散模型的核心是两个过程：
+1.  **前向过程（加噪）**：从真实数据 $\mathbf{x}_0$ 逐步加噪，得到 $\mathbf{x}_1, \mathbf{x}_2, ..., \mathbf{x}_T$，最终 $\mathbf{x}_T$ 近似标准高斯分布。
+2.  **反向过程（去噪）**：学习一个马尔可夫链 $p_\theta(\mathbf{x}_{t-1} | \mathbf{x}_t)$，从 $\mathbf{x}_T$ 逐步去噪，还原出 $\mathbf{x}_0$。
+
+这部分推导的目标，就是**从反向过程的联合概率，计算初始样本 $\mathbf{x}_0$ 的边缘概率 $p_\theta(\mathbf{x}_0)$**，也就是模型对真实数据的拟合概率。
+
+---
+
+#### 二、逐公式拆解推导
+
+**1. 公式(19)：完整反向路径的联合概率**
+
+$$
+p_\theta(\mathbf{x}_{0:T}) = p_\theta(\mathbf{x}_0 | \mathbf{x}_1) p_\theta(\mathbf{x}_1 | \mathbf{x}_2) \cdots p_\theta(\mathbf{x}_{T-1} | \mathbf{x}_T) p_\theta(\mathbf{x}_T)
+$$
+
+- **逻辑**：反向过程是**马尔可夫链**，满足马尔可夫性：未来状态只依赖当前状态，与历史无关。
+- **展开**：联合概率 = 初始噪声分布 $p_\theta(\mathbf{x}_T)$（通常取标准高斯 $\mathcal{N}(\mathbf{0}, \mathbf{I})$） × 每一步的反向转移概率 $p_\theta(\mathbf{x}_{t-1} | \mathbf{x}_t)$ 的连乘。
+- **意义**：完整描述了从 $\mathbf{x}_T$ 到 $\mathbf{x}_0$ 的整个去噪路径的概率。
+
+---
+
+**2. 公式(20)：边缘概率的定义（高维积分）**
+
+$$
+p_\theta(\mathbf{x}_0) = \int p_\theta(\mathbf{x}_{0:T}) d\mathbf{x}_{1:T}
+$$
+
+- **逻辑**：边缘概率的定义：要得到 $\mathbf{x}_0$ 的概率，需要对所有中间变量 $\mathbf{x}_1, \mathbf{x}_2, ..., \mathbf{x}_T$ 积分（也就是"边缘化"掉中间变量）。
+- **问题**：$\mathbf{x}_{1:T}$ 是高维向量（比如图像是 $H\times W\times 3$ 维，$T$ 通常取1000），直接计算这个高维积分**计算量爆炸，完全不可行**，因此需要用重要性采样来近似。
+
+---
+
+**3. 重要性采样的引入：公式变形**
+
+直接计算积分太贵，因此引入**重要性采样**：给积分乘上一个恒为1的比值 $\frac{q(\mathbf{x}_{1:T} | \mathbf{x}_0)}{q(\mathbf{x}_{1:T} | \mathbf{x}_0)}$，其中 $q(\cdot)$ 是**前向过程的分布**（已知、可采样，不需要学习）。
+
+$$
+p_\theta(\mathbf{x}_0) = \int p_\theta(\mathbf{x}_{0:T}) \frac{q(\mathbf{x}_{1:T} | \mathbf{x}_0)}{q(\mathbf{x}_{1:T} | \mathbf{x}_0)} d\mathbf{x}_{1:T} = \int q(\mathbf{x}_{1:T} | \mathbf{x}_0) \frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T} | \mathbf{x}_0)} d\mathbf{x}_{1:T}
+$$
+
+- **原理**：重要性采样的核心思想：
+  $$
+  \mathbb{E}_p[f(X)] = \int p(x) f(x) dx = \int q(x) \cdot \frac{p(x)}{q(x)} f(x) dx = \mathbb{E}_q\left[ \frac{p(x)}{q(x)} f(x) \right]
+  $$
+  这里我们把积分从对 $p_\theta$ 积分，转化为对**易采样的前向分布 $q$** 积分，用权重 $\frac{p_\theta}{q}$ 修正分布差异。
+- **意义**：把不可计算的高维积分，转化为了对前向分布 $q$ 的期望，而 $q$ 是已知的，可以通过采样来近似期望。
+
+---
+
+**4. 展开项：公式进一步化简**
+
+接下来把 $p_\theta(\mathbf{x}_{0:T})$ 和 $q(\mathbf{x}_{1:T} | \mathbf{x}_0)$ 展开：
+- $p_\theta(\mathbf{x}_{0:T})$ 就是公式(19)：$p_\theta(\mathbf{x}_T) \prod_{t=1}^T p_\theta(\mathbf{x}_{t-1} | \mathbf{x}_t)$
+- $q(\mathbf{x}_{1:T} | \mathbf{x}_0)$ 是前向过程的联合概率，同样满足马尔可夫性：$q(\mathbf{x}_1 | \mathbf{x}_0) q(\mathbf{x}_2 | \mathbf{x}_1) \cdots q(\mathbf{x}_T | \mathbf{x}_{T-1})$
+
+代入后得到：
+
+$$
+p_\theta(\mathbf{x}_0) = \int q(\mathbf{x}_{1:T} | \mathbf{x}_0) p_\theta(\mathbf{x}_T) \frac{p_\theta(\mathbf{x}_0 | \mathbf{x}_1) p_\theta(\mathbf{x}_1 | \mathbf{x}_2) \cdots p_\theta(\mathbf{x}_{T-1} | \mathbf{x}_T)}{q(\mathbf{x}_T | \mathbf{x}_{T-1}) \cdots q(\mathbf{x}_3 | \mathbf{x}_2) q(\mathbf{x}_2 | \mathbf{x}_1) q(\mathbf{x}_1 | \mathbf{x}_0)} d\mathbf{x}_{1:T}
+$$
+
+- **逻辑**：分子是反向过程的转移概率连乘，分母是前向过程的转移概率连乘，把比值拆成了每一步的概率比。
+- **意义**：把联合概率的比值，拆成了每一步去噪/加噪的概率比，为后续转化为期望做准备。
+
+---
+
+**5. 公式(21)：转化为期望形式**
+
+根据期望的定义：$\int q(x) f(x) dx = \mathbb{E}_q[f(x)]$，上面的积分可以直接写成对 $q(\mathbf{x}_{1:T} | \mathbf{x}_0)$ 的期望：
+
+$$
+p_\theta(\mathbf{x}_0) = \mathbb{E}_{q(\mathbf{x}_{1:T} | \mathbf{x}_0)} \left[ p_\theta(\mathbf{x}_T) \frac{p_\theta(\mathbf{x}_0 | \mathbf{x}_1) p_\theta(\mathbf{x}_1 | \mathbf{x}_2) \cdots p_\theta(\mathbf{x}_{T-1} | \mathbf{x}_T)}{q(\mathbf{x}_T | \mathbf{x}_{T-1}) \cdots q(\mathbf{x}_2 | \mathbf{x}_1) q(\mathbf{x}_1 | \mathbf{x}_0)} \right]
+$$
+
+- **核心突破**：把高维积分转化为了**蒙特卡洛可计算的期望**！
+  - 我们可以从 $q(\mathbf{x}_{1:T} | \mathbf{x}_0)$ 中采样多条前向路径（也就是给 $\mathbf{x}_0$ 加噪得到 $\mathbf{x}_{1:T}$），然后计算每条路径的权重，取平均就可以近似 $p_\theta(\mathbf{x}_0)$。
+- **意义**：这是扩散模型中**变分下界（ELBO）**推导的核心步骤，后续的损失函数就是基于这个期望的对数来构造的。
+
+---
+
+**6. 最后一行：实际使用的反向转移概率**
+
+$$
+p_\theta(\mathbf{x}_{t-1} | \mathbf{x}_t) = \mathcal{N}\left( \mathbf{x}_{t-1} ; \frac{1}{\sqrt{\bar{\alpha}_t}} \left( \mathbf{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}} \hat{\epsilon}_t \right), \frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t} \beta_t \mathbf{I} \right)
+$$
+
+- **符号说明**：
+  - $\alpha_t = 1-\beta_t$，$\bar{\alpha}_t = \prod_{s=1}^t \alpha_s$（前向过程的累积系数，超参数）
+  - $\hat{\epsilon}_t$ 是模型预测的噪声（扩散模型的核心学习目标：预测每一步加的噪声）
+  - $\mathcal{N}(\cdot ; \mu, \Sigma)$ 表示高斯分布，均值为 $\mu$，协方差为 $\Sigma$
+- **逻辑**：这是扩散模型中**实际训练的反向转移概率**，均值由模型预测的噪声 $\hat{\epsilon}_t$ 决定，协方差是固定的超参数（由前向过程的 $\beta_t$ 决定）。
+- **意义**：给出了公式(19)中 $p_\theta(\mathbf{x}_{t-1} | \mathbf{x}_t)$ 的具体形式，是模型训练和采样的基础。
+
+---
+
+#### 三、整个推导的核心逻辑总结
+
+1.  **目标**：计算初始数据 $\mathbf{x}_0$ 的概率 $p_\theta(\mathbf{x}_0)$，衡量模型对真实数据的拟合能力。
+2.  **问题**：直接边缘化中间变量的高维积分不可计算。
+3.  **解决方案**：用**重要性采样**，把对反向分布 $p_\theta$ 的积分，转化为对已知的前向分布 $q$ 的期望。
+4.  **结果**：得到了可通过蒙特卡洛采样近似的期望形式，为扩散模型的**变分下界（ELBO）损失**提供了理论基础。
+5.  **落地**：给出了实际使用的反向转移概率的高斯分布形式，明确了模型的学习目标（预测噪声 $\hat{\epsilon}_t$）。
+
+---
+
+#### 四、补充：与扩散模型训练的关联
+
+这个推导是扩散模型**损失函数**的源头：
+- 我们的训练目标是最大化 $\log p_\theta(\mathbf{x}_0)$，也就是最大化公式(21)中期望的对数。
+- 通过Jensen不等式，可以得到对数似然的变分下界（ELBO）：
+  $$
+  \log p_\theta(\mathbf{x}_0) \geq \mathbb{E}_q\left[ \log \frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T} | \mathbf{x}_0)} \right]
+  $$
+- 最大化这个下界，就等价于最小化扩散模型的损失函数（通常简化为噪声预测的MSE损失）。
+
+---
+
+#### 五、关键概念补充
+
+| 概念 | 含义 |
+|------|------|
+| 马尔可夫链 | 未来状态仅依赖当前状态，与历史无关，是扩散模型前后向过程的核心假设 |
+| 边缘化（Marginalization） | 对联合概率中的无关变量积分，得到目标变量的边缘概率 |
+| 重要性采样 | 用易采样的分布 $q$ 近似难采样的分布 $p$，通过权重修正分布差异，解决高维积分问题 |
+| 变分下界（ELBO） | 对数似然的下界，是扩散模型训练的核心优化目标 |
+| 反向转移概率 $p_\theta(\mathbf{x}_{t-1} | \mathbf{x}_t)$ | 模型学习的去噪步骤，从 $\mathbf{x}_t$ 预测 $\mathbf{x}_{t-1}$ 的分布 |
+| 前向转移概率 $q(\mathbf{x}_t | \mathbf{x}_{t-1})$ | 已知的加噪步骤，不需要学习，由超参数 $\beta_t$ 决定 |
+
+### 3.6 补充证明：变分下界推导全解析
+
+本节是对 3.3 节损失函数推导的教学性补充，从动机到最终结果逐步拆解逻辑，帮助彻底理解变分扩散模型（VDM）的变分下界（VB）推导。本质是用 KL 散度构造对数似然的下界，最终把训练目标转化为可计算的噪声匹配损失。
+
+#### 一、核心目标：为什么要做这个推导？
+
+**核心问题**。扩散模型的本质是：
+- **前向过程（加噪）**：从干净数据 $\mathbf{x}_0$ 逐步加噪，得到 $\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T$（$\mathbf{x}_T$ 近似标准正态分布 $\mathcal{N}(\mathbf{0}, \mathbf{I})$）
+- **反向过程（去噪）**：从 $\mathbf{x}_T$ 逐步去噪，还原 $\mathbf{x}_0$，对应分布 $p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$
+
+我们的目标是**最大化对数似然 $\log p_\theta(\mathbf{x}_0)$**，但直接计算 $\log p_\theta(\mathbf{x}_0)$ 是不可行的（需要积分所有中间变量 $\mathbf{x}_{1:T}$），因此用**变分推断**构造一个**证据下界（ELBO，也就是这里的 VB）**：
+
+$$\log p_\theta(\mathbf{x}_0) \geq \text{VB}$$
+
+最大化 VB 等价于最大化对数似然的下界，从而间接优化模型。
+
+**核心工具：KL 散度**。KL 散度衡量两个分布的"距离"，非负，当且仅当两个分布完全相同时为 0：
+
+$$\text{KL}(q \,\|\, p) = \mathbb{E}_q\!\left[\log \frac{q}{p}\right] \geq 0$$
+
+这是整个推导的起点。
+
+#### 二、从 KL 散度到变分下界
+
+**第一步：KL 散度的定义与展开**。用近似后验 $q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)$（前向加噪过程，已知、可计算）去逼近真实后验 $p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)$（反向去噪过程，待优化），定义 KL 散度：
+
+$$0 \leq \text{KL}\big(q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) \,\|\, p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)\big) = \mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)} \left[ \log \frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)} \right]$$
+
+**第二步：贝叶斯定理拆分 $p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)$**。根据贝叶斯定理：
+
+$$p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0) = \frac{p_\theta(\mathbf{x}_{1:T}, \mathbf{x}_0)}{p_\theta(\mathbf{x}_0)} = \frac{p_\theta(\mathbf{x}_{0:T})}{p_\theta(\mathbf{x}_0)}$$
+
+代入 KL 散度：
+
+$$\text{KL}\big(q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) \,\|\, p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)\big) = \mathbb{E}_{q} \left[ \log \frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) \cdot p_\theta(\mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \right] = \mathbb{E}_{q} \left[ \log \frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \right] + \mathbb{E}_{q} \left[ \log p_\theta(\mathbf{x}_0) \right]$$
+
+**第三步：简化期望项**。注意 $\log p_\theta(\mathbf{x}_0)$ 不依赖 $\mathbf{x}_{1:T}$，因此对 $q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)$ 求期望等于自身：
+
+$$\mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)} \left[ \log p_\theta(\mathbf{x}_0) \right] = \log p_\theta(\mathbf{x}_0)$$
+
+代入后得到：
+
+$$\text{KL}\big(q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) \,\|\, p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)\big) = \mathbb{E}_{q} \left[ \log \frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \right] + \log p_\theta(\mathbf{x}_0) \geq 0$$
+
+移项得到对数似然的下界：
+
+$$\log p_\theta(\mathbf{x}_0) \geq - \mathbb{E}_{q} \left[ \log \frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \right]$$
+
+**第四步：对 $q(\mathbf{x}_0)$ 取期望**。我们最终要优化的是**数据分布上的期望**，因此对 $q(\mathbf{x}_0)$（真实数据分布）取期望：
+
+$$\mathbb{E}_{q(\mathbf{x}_0)} \left[ \log p_\theta(\mathbf{x}_0) \right] \geq - \mathbb{E}_{q(\mathbf{x}_{0:T})} \left[ \log \frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \right]$$
+
+右边就是**变分下界 VB**，我们的目标就是最小化 VB（等价于最大化对数似然）。
+
+#### 三、VB 的展开与化简
+
+**第一步：展开马尔可夫链结构**。扩散模型的前向/反向过程都是马尔可夫链，因此：
+- 前向：$q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) = q(\mathbf{x}_1 \mid \mathbf{x}_0)\,q(\mathbf{x}_2 \mid \mathbf{x}_1) \cdots q(\mathbf{x}_T \mid \mathbf{x}_{T-1})$
+- 反向：$p_\theta(\mathbf{x}_{0:T}) = p_\theta(\mathbf{x}_T)\,p_\theta(\mathbf{x}_{T-1} \mid \mathbf{x}_T) \cdots p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)$
+
+代入 VB：
+
+$$\mathbb{E}_{q(\mathbf{x}_{0:T})} \log \frac{q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} = \mathbb{E}_{q} \log \frac{q(\mathbf{x}_1 \mid \mathbf{x}_0) \prod_{t=2}^{T} q(\mathbf{x}_t \mid \mathbf{x}_{t-1})}{p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1) \prod_{t=2}^{T} p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t) \cdot p_\theta(\mathbf{x}_T)}$$
+
+$$= \mathbb{E}_{q} \log \frac{q(\mathbf{x}_1 \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)} - \mathbb{E}_{q} \log p_\theta(\mathbf{x}_T) + \mathbb{E}_{q} \sum_{t=2}^{T} \log \frac{q(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)}$$
+
+**第二步：再次用贝叶斯定理拆分 $q(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{x}_0)$**。对任意 $t \geq 2$，前向过程的后验满足：
+
+$$q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0) = \frac{q(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{x}_0)\,q(\mathbf{x}_{t-1} \mid \mathbf{x}_0)}{q(\mathbf{x}_t \mid \mathbf{x}_0)}$$
+
+因此：
+
+$$\log \frac{q(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)} = \log \frac{q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)\,q(\mathbf{x}_t \mid \mathbf{x}_0)}{q(\mathbf{x}_{t-1} \mid \mathbf{x}_0)\,p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)} = \log \frac{q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)} + \log \frac{q(\mathbf{x}_t \mid \mathbf{x}_0)}{q(\mathbf{x}_{t-1} \mid \mathbf{x}_0)}$$
+
+**第三步：伸缩求和（Telescoping Sum）**。对 $t=2$ 到 $T$ 求和时，$\log \frac{q(\mathbf{x}_t \mid \mathbf{x}_0)}{q(\mathbf{x}_{t-1} \mid \mathbf{x}_0)}$ 形成伸缩和，中间项全部抵消：
+
+$$\sum_{t=2}^{T} \log \frac{q(\mathbf{x}_t \mid \mathbf{x}_0)}{q(\mathbf{x}_{t-1} \mid \mathbf{x}_0)} = \log \frac{q(\mathbf{x}_T \mid \mathbf{x}_0)}{q(\mathbf{x}_1 \mid \mathbf{x}_0)}$$
+
+**第四步：合并得到最终 VB 分解**。把所有项合并，$q(\mathbf{x}_1 \mid \mathbf{x}_0)$ 消去，最终 VB 被拆分为 3 个可解释的部分：
+
+$$\text{VB} = \underbrace{\mathbb{E}_{q} \log \frac{q(\mathbf{x}_T \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_T)}}_{\text{项 I}} - \underbrace{\mathbb{E}_{q} \log p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)}_{\text{项 II}} + \underbrace{\mathbb{E}_{q} \sum_{t=2}^{T} \log \frac{q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)}}_{\text{项 III}}$$
+
+#### 四、三个项的物理意义与简化
+
+**项 I**：$\mathbb{E}_{q} \log \frac{q(\mathbf{x}_T \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_T)}$
+- **意义**：衡量加噪后的 $\mathbf{x}_T$ 分布 $q(\mathbf{x}_T \mid \mathbf{x}_0)$ 与预设的先验 $p_\theta(\mathbf{x}_T)$（通常设为 $\mathcal{N}(\mathbf{0}, \mathbf{I})$）的 KL 散度。
+- **简化**：当 $T$ 足够大时，$q(\mathbf{x}_T \mid \mathbf{x}_0)$ 会收敛到 $\mathcal{N}(\mathbf{0}, \mathbf{I})$，因此项 I 近似为 0，训练中可以忽略。
+
+**项 II**：$-\mathbb{E}_{q} \log p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)$
+- **意义**：对应 $t=1$ 步的去噪损失，衡量从 $\mathbf{x}_1$ 还原 $\mathbf{x}_0$ 的重构误差。
+- **简化**：在实践中通常被忽略（或合并到项 III），因为扩散模型的核心是中间步的去噪，最后一步的重构误差影响很小。
+
+**项 III**：$\mathbb{E}_{q} \sum_{t=2}^{T} \log \frac{q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)}$
+- **意义**：**核心训练项**，每一项都是 $q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)$（前向过程的真实后验，已知）和 $p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$（模型预测的去噪分布，待优化）的 KL 散度。
+- **优化目标**：最小化项 III，等价于让模型预测的去噪分布 $p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$ 尽可能逼近真实后验 $q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)$。
+
+#### 五、高斯分布下的 KL 散度闭式解与最终损失
+
+**核心前提：两个分布都是各向同性高斯**。扩散模型的前向/反向过程都假设为各向同性高斯分布，因此：
+
+- 真实后验：$q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0) = \mathcal{N}\!\left( \frac{1}{\sqrt{\alpha_t}} \left( \mathbf{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}} \boldsymbol{\epsilon}_t \right),\; \frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t} \beta_t \,\mathbf{I} \right)$
+
+  其中 $\alpha_t = 1-\beta_t$，$\bar{\alpha}_t = \prod_{s=1}^{t} \alpha_s$，$\boldsymbol{\epsilon}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ 是加的噪声。
+
+- 模型预测：$p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t) = \mathcal{N}\!\left( \mu_\theta(\mathbf{x}_t, t),\; \sigma_t^2 \,\mathbf{I} \right)$
+
+**高斯 KL 散度的闭式解**。对于两个各向同性高斯 $\mathcal{N}(\boldsymbol{\mu}_1, \sigma_1^2 \mathbf{I})$ 和 $\mathcal{N}(\boldsymbol{\mu}_2, \sigma_2^2 \mathbf{I})$，KL 散度的闭式解为：
+
+$$\text{KL}\big(\mathcal{N}(\boldsymbol{\mu}_1, \sigma_1^2 \mathbf{I}) \,\|\, \mathcal{N}(\boldsymbol{\mu}_2, \sigma_2^2 \mathbf{I})\big) = \frac{1}{2\sigma_2^2} \|\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2\|_2^2 + \text{常数项（仅与方差有关）}$$
+
+代入两个分布的均值和方差，化简后常数项被抵消，最终得到：
+
+$$\text{KL}\big(q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0) \,\|\, p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)\big) = \frac{\beta_t}{2(1-\beta_t)(1-\bar{\alpha}_{t-1})} \|\boldsymbol{\epsilon}_t - \hat{\boldsymbol{\epsilon}}_t\|_2^2$$
+
+其中 $\hat{\boldsymbol{\epsilon}}_t$ 是模型预测的噪声（$\mu_\theta(\mathbf{x}_t, t)$ 由 $\hat{\boldsymbol{\epsilon}}_t$ 参数化）。
+
+**最终训练目标：噪声匹配损失**。把所有 $t$ 的 KL 散度求和，忽略项 I 和项 II，最终 VB 简化为：
+
+$$\text{VB} = \sum_{t=2}^{T} \frac{\beta_t}{2(1-\beta_t)(1-\bar{\alpha}_{t-1})} \|\boldsymbol{\epsilon}_t - \hat{\boldsymbol{\epsilon}}_t\|_2^2$$
+
+这就是扩散模型的**核心训练目标**：让模型预测的噪声 $\hat{\boldsymbol{\epsilon}}_t$ 尽可能逼近真实加的噪声 $\boldsymbol{\epsilon}_t$，也就是"噪声匹配"。
+
+#### 六、关键术语与符号对照表
+
+| 符号 | 含义 |
+|------|------|
+| $\mathbf{x}_0$ | 干净数据（原始输入） |
+| $\mathbf{x}_t$ | 第 $t$ 步加噪后的数据 |
+| $q(\mathbf{x}_t \mid \mathbf{x}_{t-1})$ | 前向加噪过程（已知，固定） |
+| $p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$ | 反向去噪过程（待优化，模型） |
+| $\beta_t$ | 加噪率（超参数，$0 < \beta_t < 1$） |
+| $\alpha_t = 1-\beta_t$ | 加噪率的补 |
+| $\bar{\alpha}_t = \prod_{s=1}^{t} \alpha_s$ | 累计加噪率 |
+| $\boldsymbol{\epsilon}_t$ | 真实加的噪声（$\mathcal{N}(\mathbf{0}, \mathbf{I})$） |
+| $\hat{\boldsymbol{\epsilon}}_t$ | 模型预测的噪声 |
+| $\text{KL}(q \,\|\, p)$ | KL 散度，衡量两个分布的距离 |
+| VB | 变分下界（Variational Bound），对数似然的下界 |
+| ELBO | 证据下界（Evidence Lower Bound），与 VB 等价 |
+
+#### 七、推导的核心逻辑总结
+
+1. **问题转化**：把"最大化对数似然"转化为"最小化变分下界 VB"，解决直接计算对数似然不可行的问题。
+2. **结构拆分**：利用马尔可夫链和贝叶斯定理，把 VB 拆分为 3 个可解释的项，核心是中间步的 KL 散度项。
+3. **高斯简化**：利用高斯分布 KL 散度的闭式解，把抽象的分布匹配转化为具体的"噪声预测 MSE 损失"。
+4. **最终目标**：训练模型让预测的噪声 $\hat{\boldsymbol{\epsilon}}_t$ 逼近真实噪声 $\boldsymbol{\epsilon}_t$，完成去噪能力的学习。
+
+#### 八、与 DDPM 的关系
+
+我们熟知的 DDPM（Denoising Diffusion Probabilistic Models）就是这个推导的**简化版本**：
+- DDPM 直接把 VB 中的项 I、项 II 忽略，只保留项 III 的噪声匹配损失。
+- DDPM 把 $\frac{\beta_t}{2(1-\beta_t)(1-\bar{\alpha}_{t-1})}$ 简化为固定权重，最终损失为 $\mathbb{E}_{t, \mathbf{x}_0, \boldsymbol{\epsilon}_t}\!\left[ \|\boldsymbol{\epsilon}_t - \hat{\boldsymbol{\epsilon}}_\theta(\mathbf{x}_t, t)\|_2^2 \right]$，和这里的推导完全一致。
+
+#### 九、常见问题
+
+**为什么叫"变分"下界？** 因为我们用了一个近似分布 $q$（变分分布）去逼近真实后验 $p_\theta$，从而构造了对数似然的下界，这是变分推断的核心思想。
+
+**为什么 KL 散度非负很重要？** KL 散度非负保证了我们构造的 VB 一定是对数似然的下界，因此最小化 VB 一定能提升对数似然，不会出现优化方向错误的问题。
+
+**为什么最终变成了噪声预测？** 因为扩散模型的前向过程是加噪，反向过程本质是"预测加的噪声并去除"，因此用噪声匹配作为损失，是最直观、最容易优化的目标。
 
 ---
 
