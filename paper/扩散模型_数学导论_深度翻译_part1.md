@@ -26,7 +26,7 @@
    - 3.2 [逆过程与真实后验（DDPM 后验）](#32-逆过程与真实后验ddpm-后验)
    - 3.3 [损失函数](#33-损失函数)
    - 3.4 [计算 p_θ(x_0)](#34-计算-p_θx_0)
-   - 3.6 [补充证明：变分下界推导全解析](#36-补充证明变分下界推导全解析)
+   - 3.5 [补充证明：变分下界推导全解析](#35-补充证明变分下界推导全解析)
 4. [加速方法](#4-加速方法)
    - 4.1 [去噪扩散隐式模型（DDIM）](#41-去噪扩散隐式模型ddim)
    - 4.2 [DDGAN：对抗学习的逆动力学](#42-ddgan对抗学习的逆动力学)
@@ -142,7 +142,7 @@ $$\text{tr}(\mathbf{A}) = \sum_{i=1}^{d} A_{ii}$$
 
 $$\mathbf{v}^\top \mathbf{A}\,\mathbf{u} = \text{tr}(\mathbf{A}\,\mathbf{u}\mathbf{v}^\top) \tag{Eq.2-1}$$
 
-> **证明**：从右侧出发。由引理 2.2 的 (ii) 和 (iii)：$\text{tr}(\mathbf{A}\mathbf{u}\mathbf{v}^\top) = \text{tr}(\mathbf{u}\mathbf{v}^\top\mathbf{A}) = \text{tr}(\mathbf{u}(\mathbf{A}^\top\mathbf{v})^\top) = \mathbf{v}^\top\mathbf{A}\,\mathbf{u}$。$\square$
+> **证明**：从右侧出发。由引理 2.2 的 (ii) 和 (iii)：$\text{tr}(\mathbf{A}\mathbf{u}\mathbf{v}^\top) = \text{tr}(\mathbf{u}\mathbf{v}^\top\mathbf{A}) = \text{tr}(\mathbf{u}(\mathbf{A}^\top\mathbf{v})^\top) = \mathbf{v}^\top\mathbf{A}\,\mathbf{u}$
 
 **命题 2.4**（中心二次型的期望）。设 $p$ 为 $\mathbb{R}^d$ 上的高斯 $\mathcal{N}(\boldsymbol{\mu}_p, \boldsymbol{\Sigma}_p)$，$\mathbf{x} \sim p$。对任意 $\mathbf{A} \in \mathbb{R}^{d \times d}$：
 
@@ -150,7 +150,7 @@ $$\mathbb{E}_p\big[(\mathbf{x}-\boldsymbol{\mu}_p)^\top \mathbf{A}\,(\mathbf{x}-
 
 > **证明**：令 $\mathbf{z} := \mathbf{x} - \boldsymbol{\mu}_p \sim \mathcal{N}(\mathbf{0}, \boldsymbol{\Sigma}_p)$。由引理 2.3 以及迹和期望的线性性：
 > $$\mathbb{E}_p[\mathbf{z}^\top\mathbf{A}\mathbf{z}] = \mathbb{E}_p[\text{tr}(\mathbf{A}\,\mathbf{z}\mathbf{z}^\top)] = \text{tr}(\mathbf{A}\,\mathbb{E}_p[\mathbf{z}\mathbf{z}^\top]) = \text{tr}(\mathbf{A}\,\boldsymbol{\Sigma}_p)$$
-> $\square$
+
 
 ### 2.3 高斯采样的重参数化
 
@@ -170,7 +170,7 @@ $$\mathbf{x} = \boldsymbol{\mu} + \mathbf{A}\mathbf{z} \sim \mathcal{N}(\boldsym
 > 对于协方差，利用定义 $\text{Cov}[\mathbf{x}] = \mathbb{E}[(\mathbf{x}-\mathbb{E}[\mathbf{x}])(\mathbf{x}-\mathbb{E}[\mathbf{x}])^\top]$：
 > $$\text{Cov}[\mathbf{x}] = \mathbb{E}[(\mathbf{A}\mathbf{z})(\mathbf{A}\mathbf{z})^\top] = \mathbb{E}[\mathbf{A}\,\mathbf{z}\mathbf{z}^\top\mathbf{A}^\top] = \mathbf{A}\,\mathbb{E}[\mathbf{z}\mathbf{z}^\top]\,\mathbf{A}^\top = \mathbf{A}\,\mathbf{I}_d\,\mathbf{A}^\top = \mathbf{A}\mathbf{A}^\top$$
 > 
-> 其中 $\mathbb{E}[\mathbf{z}\mathbf{z}^\top] = \mathbf{I}_d$ 可以显式验证：写 $\mathbf{z} = (z_1,\ldots,z_d)^\top$，各 $z_i \sim \mathcal{N}(0,1)$ 且不相关，则 $[\mathbb{E}[\mathbf{z}\mathbf{z}^\top]]_{ij} = \mathbb{E}[z_i z_j]$，当 $i \neq j$ 时为 0，当 $i = j$ 时为 1。$\square$
+> 其中 $\mathbb{E}[\mathbf{z}\mathbf{z}^\top] = \mathbf{I}_d$ 可以显式验证：写 $\mathbf{z} = (z_1,\ldots,z_d)^\top$，各 $z_i \sim \mathcal{N}(0,1)$ 且不相关，则 $[\mathbb{E}[\mathbf{z}\mathbf{z}^\top]]_{ij} = \mathbb{E}[z_i z_j]$，当 $i \neq j$ 时为 0，当 $i = j$ 时为 1。
 
 **推论 2.7**（采样 $\mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma})$）。若 $\boldsymbol{\Sigma}$ 对称半正定且 $\mathbf{A}$ 满足 $\mathbf{A}\mathbf{A}^\top = \boldsymbol{\Sigma}$（如当 $\boldsymbol{\Sigma} \succ \mathbf{0}$ 时取 Cholesky 分解），则对 $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_d)$：
 
@@ -207,7 +207,7 @@ $$\boldsymbol{\Sigma} = \big(\boldsymbol{\Sigma}_p^{-1} + \boldsymbol{\Sigma}_q^
 > $q(\mathbf{x})$ 类似。相乘并合并同类项得：
 > $$p(\mathbf{x})\,q(\mathbf{x}) \propto \exp\Big(-\tfrac{1}{2}\mathbf{x}^\top\underbrace{(\boldsymbol{\Sigma}_p^{-1}+\boldsymbol{\Sigma}_q^{-1})}_{\boldsymbol{\Lambda}}\mathbf{x} + \mathbf{x}^\top\underbrace{(\boldsymbol{\Sigma}_p^{-1}\boldsymbol{\mu}_p+\boldsymbol{\Sigma}_q^{-1}\boldsymbol{\mu}_q)}_{\boldsymbol{\eta}}\Big)$$
 > 
-> 应用引理 2.10，将指数改写为 $-\tfrac{1}{2}(\mathbf{x}-\boldsymbol{\mu})^\top\boldsymbol{\Lambda}(\mathbf{x}-\boldsymbol{\mu}) + \text{const}$，其中 $\boldsymbol{\mu} = \boldsymbol{\Lambda}^{-1}\boldsymbol{\eta}$。识别出 $\boldsymbol{\Sigma} = \boldsymbol{\Lambda}^{-1}$ 即得所述均值和协方差。$\square$
+> 应用引理 2.10，将指数改写为 $-\tfrac{1}{2}(\mathbf{x}-\boldsymbol{\mu})^\top\boldsymbol{\Lambda}(\mathbf{x}-\boldsymbol{\mu}) + \text{const}$，其中 $\boldsymbol{\mu} = \boldsymbol{\Lambda}^{-1}\boldsymbol{\eta}$。识别出 $\boldsymbol{\Sigma} = \boldsymbol{\Lambda}^{-1}$ 即得所述均值和协方差。
 
 **推论 2.12**（各向同性特殊情形）。若 $\boldsymbol{\Sigma}_p = \sigma_p^2 \mathbf{I}_d$，$\boldsymbol{\Sigma}_q = \sigma_q^2 \mathbf{I}_d$，则：
 
@@ -468,7 +468,15 @@ $$p_\theta(\mathbf{x}_{0:T}) = p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)\,p_\thet
 
 $$p_\theta(\mathbf{x}_0) = \int p_\theta(\mathbf{x}_{0:T})\,\mathrm{d}\mathbf{x}_{1:T} \tag{20}$$
 
-直接计算代价高昂，因此使用重要性采样，乘以 $\frac{q(\mathbf{x}_{1:T}|\mathbf{x}_0)}{q(\mathbf{x}_{1:T}|\mathbf{x}_0)}$ 后得到：
+直接计算代价高昂，因此引入**重要性采样**，给积分乘以恒等于 1 的比值 $\frac{q(\mathbf{x}_{1:T}|\mathbf{x}_0)}{q(\mathbf{x}_{1:T}|\mathbf{x}_0)}$，不改变积分结果，但将积分测度换成易于采样的前向分布 $q$：
+
+$$p_\theta(\mathbf{x}_0) = \int p_\theta(\mathbf{x}_{0:T})\,\frac{q(\mathbf{x}_{1:T}|\mathbf{x}_0)}{q(\mathbf{x}_{1:T}|\mathbf{x}_0)}\,\mathrm{d}\mathbf{x}_{1:T} = \int q(\mathbf{x}_{1:T}|\mathbf{x}_0)\,\frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T}|\mathbf{x}_0)}\,\mathrm{d}\mathbf{x}_{1:T}$$
+
+将 $p_\theta(\mathbf{x}_{0:T})$（式19）与前向联合分布 $q(\mathbf{x}_{1:T}|\mathbf{x}_0) = \prod_{t=1}^T q(\mathbf{x}_t|\mathbf{x}_{t-1})$ 各自展开后，分子分母逐步对消，得到：
+
+$$p_\theta(\mathbf{x}_0) = \int q(\mathbf{x}_{1:T}|\mathbf{x}_0)\,p_\theta(\mathbf{x}_T)\,\frac{p_\theta(\mathbf{x}_0|\mathbf{x}_1)\,p_\theta(\mathbf{x}_1|\mathbf{x}_2)\cdots p_\theta(\mathbf{x}_{T-1}|\mathbf{x}_T)}{q(\mathbf{x}_T|\mathbf{x}_{T-1})\cdots q(\mathbf{x}_2|\mathbf{x}_1)\,q(\mathbf{x}_1|\mathbf{x}_0)}\,\mathrm{d}\mathbf{x}_{1:T}$$
+
+根据期望的定义，上式等价于：
 
 $$p_\theta(\mathbf{x}_0) = \mathbb{E}_{q(\mathbf{x}_{1:T}|\mathbf{x}_0)}\bigg[p_\theta(\mathbf{x}_T)\,\frac{p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)\,p_\theta(\mathbf{x}_1 \mid \mathbf{x}_2) \cdots p_\theta(\mathbf{x}_{T-1} \mid \mathbf{x}_T)}{q(\mathbf{x}_T \mid \mathbf{x}_{T-1}) \cdots q(\mathbf{x}_2 \mid \mathbf{x}_1)\,q(\mathbf{x}_1 \mid \mathbf{x}_0)}\bigg] \tag{21}$$
 
@@ -478,11 +486,11 @@ $$p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t) = \mathcal{N}\bigg(\mathbf{x}_{t-
 
 ### 3.5 补充说明：计算 $p_\theta(\mathbf{x}_0)$ 的公式推导详细解读
 
-这部分是**扩散模型（Diffusion Model）**中，从完整反向路径的联合概率，推导初始样本 $\mathbf{x}_0$ 的边缘概率 $p_\theta(\mathbf{x}_0)$ 的核心过程，本质是用**重要性采样（Importance Sampling）**解决高维积分的计算难题。下面我们逐行拆解每一步的逻辑、原理和意义。
+这部分是**扩散模型（Diffusion Model）** 中，从完整反向路径的联合概率，推导初始样本 $\mathbf{x}_0$ 的边缘概率 $p_\theta(\mathbf{x}_0)$ 的核心过程，本质是用**重要性采样（Importance Sampling）** 解决高维积分的计算难题。下面我们逐行拆解每一步的逻辑、原理和意义。
 
 ---
 
-#### 一、背景铺垫：扩散模型的反向马尔可夫链
+#### 背景铺垫：扩散模型的反向马尔可夫链
 
 扩散模型的核心是两个过程：
 1.  **前向过程（加噪）**：从真实数据 $\mathbf{x}_0$ 逐步加噪，得到 $\mathbf{x}_1, \mathbf{x}_2, ..., \mathbf{x}_T$，最终 $\mathbf{x}_T$ 近似标准高斯分布。
@@ -492,7 +500,7 @@ $$p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t) = \mathcal{N}\bigg(\mathbf{x}_{t-
 
 ---
 
-#### 二、逐公式拆解推导
+#### 逐公式拆解推导
 
 **1. 公式(19)：完整反向路径的联合概率**
 
@@ -580,7 +588,7 @@ $$
 
 ---
 
-#### 三、整个推导的核心逻辑总结
+#### 整个推导的核心逻辑总结
 
 1.  **目标**：计算初始数据 $\mathbf{x}_0$ 的概率 $p_\theta(\mathbf{x}_0)$，衡量模型对真实数据的拟合能力。
 2.  **问题**：直接边缘化中间变量的高维积分不可计算。
@@ -590,7 +598,7 @@ $$
 
 ---
 
-#### 四、补充：与扩散模型训练的关联
+#### 补充：与扩散模型训练的关联
 
 这个推导是扩散模型**损失函数**的源头：
 - 我们的训练目标是最大化 $\log p_\theta(\mathbf{x}_0)$，也就是最大化公式(21)中期望的对数。
@@ -602,7 +610,7 @@ $$
 
 ---
 
-#### 五、关键概念补充
+#### 关键概念补充
 
 | 概念 | 含义 |
 |------|------|
@@ -610,14 +618,14 @@ $$
 | 边缘化（Marginalization） | 对联合概率中的无关变量积分，得到目标变量的边缘概率 |
 | 重要性采样 | 用易采样的分布 $q$ 近似难采样的分布 $p$，通过权重修正分布差异，解决高维积分问题 |
 | 变分下界（ELBO） | 对数似然的下界，是扩散模型训练的核心优化目标 |
-| 反向转移概率 $p_\theta(\mathbf{x}_{t-1} | \mathbf{x}_t)$ | 模型学习的去噪步骤，从 $\mathbf{x}_t$ 预测 $\mathbf{x}_{t-1}$ 的分布 |
-| 前向转移概率 $q(\mathbf{x}_t | \mathbf{x}_{t-1})$ | 已知的加噪步骤，不需要学习，由超参数 $\beta_t$ 决定 |
+| 反向转移概率 $p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$ | 模型学习的去噪步骤，从 $\mathbf{x}_t$ 预测 $\mathbf{x}_{t-1}$ 的分布 |
+| 前向转移概率 $q(\mathbf{x}_t \mid \mathbf{x}_{t-1})$ | 已知的加噪步骤，不需要学习，由超参数 $\beta_t$ 决定 |
 
 ### 3.6 补充证明：变分下界推导全解析
 
 本节是对 3.3 节损失函数推导的教学性补充，从动机到最终结果逐步拆解逻辑，帮助彻底理解变分扩散模型（VDM）的变分下界（VB）推导。本质是用 KL 散度构造对数似然的下界，最终把训练目标转化为可计算的噪声匹配损失。
 
-#### 一、核心目标：为什么要做这个推导？
+#### 核心目标：为什么要做这个推导？
 
 **核心问题**。扩散模型的本质是：
 - **前向过程（加噪）**：从干净数据 $\mathbf{x}_0$ 逐步加噪，得到 $\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T$（$\mathbf{x}_T$ 近似标准正态分布 $\mathcal{N}(\mathbf{0}, \mathbf{I})$）
@@ -635,7 +643,7 @@ $$\text{KL}(q \,\|\, p) = \mathbb{E}_q\!\left[\log \frac{q}{p}\right] \geq 0$$
 
 这是整个推导的起点。
 
-#### 二、从 KL 散度到变分下界
+#### 从 KL 散度到变分下界
 
 **第一步：KL 散度的定义与展开**。用近似后验 $q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)$（前向加噪过程，已知、可计算）去逼近真实后验 $p_\theta(\mathbf{x}_{1:T} \mid \mathbf{x}_0)$（反向去噪过程，待优化），定义 KL 散度：
 
@@ -667,7 +675,7 @@ $$\mathbb{E}_{q(\mathbf{x}_0)} \left[ \log p_\theta(\mathbf{x}_0) \right] \geq -
 
 右边就是**变分下界 VB**，我们的目标就是最小化 VB（等价于最大化对数似然）。
 
-#### 三、VB 的展开与化简
+#### VB 的展开与化简
 
 **第一步：展开马尔可夫链结构**。扩散模型的前向/反向过程都是马尔可夫链，因此：
 - 前向：$q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) = q(\mathbf{x}_1 \mid \mathbf{x}_0)\,q(\mathbf{x}_2 \mid \mathbf{x}_1) \cdots q(\mathbf{x}_T \mid \mathbf{x}_{T-1})$
@@ -695,7 +703,7 @@ $$\sum_{t=2}^{T} \log \frac{q(\mathbf{x}_t \mid \mathbf{x}_0)}{q(\mathbf{x}_{t-1
 
 $$\text{VB} = \underbrace{\mathbb{E}_{q} \log \frac{q(\mathbf{x}_T \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_T)}}_{\text{项 I}} - \underbrace{\mathbb{E}_{q} \log p_\theta(\mathbf{x}_0 \mid \mathbf{x}_1)}_{\text{项 II}} + \underbrace{\mathbb{E}_{q} \sum_{t=2}^{T} \log \frac{q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)}}_{\text{项 III}}$$
 
-#### 四、三个项的物理意义与简化
+#### 三个项的物理意义与简化
 
 **项 I**：$\mathbb{E}_{q} \log \frac{q(\mathbf{x}_T \mid \mathbf{x}_0)}{p_\theta(\mathbf{x}_T)}$
 - **意义**：衡量加噪后的 $\mathbf{x}_T$ 分布 $q(\mathbf{x}_T \mid \mathbf{x}_0)$ 与预设的先验 $p_\theta(\mathbf{x}_T)$（通常设为 $\mathcal{N}(\mathbf{0}, \mathbf{I})$）的 KL 散度。
@@ -709,7 +717,7 @@ $$\text{VB} = \underbrace{\mathbb{E}_{q} \log \frac{q(\mathbf{x}_T \mid \mathbf{
 - **意义**：**核心训练项**，每一项都是 $q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)$（前向过程的真实后验，已知）和 $p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$（模型预测的去噪分布，待优化）的 KL 散度。
 - **优化目标**：最小化项 III，等价于让模型预测的去噪分布 $p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$ 尽可能逼近真实后验 $q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)$。
 
-#### 五、高斯分布下的 KL 散度闭式解与最终损失
+#### 高斯分布下的 KL 散度闭式解与最终损失
 
 **核心前提：两个分布都是各向同性高斯**。扩散模型的前向/反向过程都假设为各向同性高斯分布，因此：
 
@@ -735,7 +743,7 @@ $$\text{VB} = \sum_{t=2}^{T} \frac{\beta_t}{2(1-\beta_t)(1-\bar{\alpha}_{t-1})} 
 
 这就是扩散模型的**核心训练目标**：让模型预测的噪声 $\hat{\boldsymbol{\epsilon}}_t$ 尽可能逼近真实加的噪声 $\boldsymbol{\epsilon}_t$，也就是"噪声匹配"。
 
-#### 六、关键术语与符号对照表
+#### 关键术语与符号对照表
 
 | 符号 | 含义 |
 |------|------|
@@ -752,20 +760,20 @@ $$\text{VB} = \sum_{t=2}^{T} \frac{\beta_t}{2(1-\beta_t)(1-\bar{\alpha}_{t-1})} 
 | VB | 变分下界（Variational Bound），对数似然的下界 |
 | ELBO | 证据下界（Evidence Lower Bound），与 VB 等价 |
 
-#### 七、推导的核心逻辑总结
+#### 推导的核心逻辑总结
 
 1. **问题转化**：把"最大化对数似然"转化为"最小化变分下界 VB"，解决直接计算对数似然不可行的问题。
 2. **结构拆分**：利用马尔可夫链和贝叶斯定理，把 VB 拆分为 3 个可解释的项，核心是中间步的 KL 散度项。
 3. **高斯简化**：利用高斯分布 KL 散度的闭式解，把抽象的分布匹配转化为具体的"噪声预测 MSE 损失"。
 4. **最终目标**：训练模型让预测的噪声 $\hat{\boldsymbol{\epsilon}}_t$ 逼近真实噪声 $\boldsymbol{\epsilon}_t$，完成去噪能力的学习。
 
-#### 八、与 DDPM 的关系
+#### 与 DDPM 的关系
 
 我们熟知的 DDPM（Denoising Diffusion Probabilistic Models）就是这个推导的**简化版本**：
 - DDPM 直接把 VB 中的项 I、项 II 忽略，只保留项 III 的噪声匹配损失。
 - DDPM 把 $\frac{\beta_t}{2(1-\beta_t)(1-\bar{\alpha}_{t-1})}$ 简化为固定权重，最终损失为 $\mathbb{E}_{t, \mathbf{x}_0, \boldsymbol{\epsilon}_t}\!\left[ \|\boldsymbol{\epsilon}_t - \hat{\boldsymbol{\epsilon}}_\theta(\mathbf{x}_t, t)\|_2^2 \right]$，和这里的推导完全一致。
 
-#### 九、常见问题
+#### 常见问题
 
 **为什么叫"变分"下界？** 因为我们用了一个近似分布 $q$（变分分布）去逼近真实后验 $p_\theta$，从而构造了对数似然的下界，这是变分推断的核心思想。
 
@@ -781,124 +789,340 @@ DDPM 模型的一个关键缺点是需要很多次迭代才能产生高质量样
 
 ### 4.1 去噪扩散隐式模型（DDIM）
 
-我们从去噪扩散隐式模型（DDIM）开始。出发点是前一小节推导的精确（DDPM）单步后验：
+我们从去噪扩散隐式模型（DDIMs）开始。推导的起点是上一节得到的精确DDPM单步后验分布：
 
-$$q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0) = \mathcal{N}\bigg(\mathbf{x}_{t-1};\, \frac{1}{\sqrt{\alpha_t}}\Big(\mathbf{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\boldsymbol{\epsilon}\Big),\, \sigma_t^2\,\mathbf{I}_d\bigg), \quad \boldsymbol{\epsilon} = \frac{\mathbf{x}_t - \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0}{\sqrt{1-\bar{\alpha}_t}} \tag{22}$$
+$$q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0) = \mathcal{N}\left( \mathbf{x}_{t-1} ; \frac{1}{\sqrt{\alpha_t}} \left( \mathbf{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}} \boldsymbol{\epsilon} \right), \sigma_t^2 \mathbf{I}_d \right), \quad \boldsymbol{\epsilon} = \frac{\mathbf{x}_t - \sqrt{\bar{\alpha}_t} \mathbf{x}_0}{\sqrt{1-\bar{\alpha}_t}} \tag{22}$$
 
-其中 $\alpha_t = 1-\beta_t$，$\bar{\alpha}_t = \prod_{i=1}^{t}\alpha_i$。设 $\sigma_t^2 = \tilde{\beta}_t := \frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}\beta_t$ 恢复标准 DDPM 逆向条件分布及其真实后验方差。
+其中 $\alpha_t=1-\beta_t$，$\bar{\alpha}_t=\prod_{i=1}^t\alpha_i$。当取 $\sigma_t^2=\tilde{\beta}_t:=\frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}\beta_t$ 时，就还原为标准DDPM的反向条件分布及其真实后验方差。利用2.3节中前向边缘分布的重参数化形式：
 
-DDIM 定义了一组**替代的**逆向条件分布，它们保持相同的单步边际 $q(\mathbf{x}_t \mid \mathbf{x}_0)$，但允许可控的逐步方差 $\sigma_t^2$：
+$$\mathbf{x}_t = \sqrt{\bar{\alpha}_t}\mathbf{x}_0+\sqrt{1-\bar{\alpha}_t}\boldsymbol{\epsilon} \quad\Rightarrow\quad \boldsymbol{\epsilon}=\frac{\mathbf{x}_t-\sqrt{\bar{\alpha}_t}\mathbf{x}_0}{\sqrt{1-\bar{\alpha}_t}}$$
 
-$$q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0) = \mathcal{N}\bigg(\mathbf{x}_{t-1};\, \underbrace{\sqrt{\bar{\alpha}_{t-1}}\,\mathbf{x}_0 + \sqrt{1-\bar{\alpha}_{t-1}-\sigma_t^2}\,\frac{\mathbf{x}_t - \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0}{\sqrt{1-\bar{\alpha}_t}}}_{均值},\, \underbrace{\sigma_t^2}_{方差}\,\mathbf{I}_d\bigg) \tag{23}$$
+将该 $\boldsymbol{\epsilon}$ 代入式(22)中DDPM后验的均值部分：
 
-$$q(\mathbf{x}_T \mid \mathbf{x}_0) = \mathcal{N}(\mathbf{x}_T;\, \sqrt{\bar{\alpha}_T}\,\mathbf{x}_0,\,(1-\bar{\alpha}_T)\mathbf{I}_d)$$
+$$\begin{align*}
+\hat{\boldsymbol{\mu}}_t^{(\text{DDPM})}(\mathbf{x}_t,\mathbf{x}_0)
+&= \frac{1}{\sqrt{\alpha_t}}\left(
+\mathbf{x}_t
+-\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\cdot\frac{\mathbf{x}_t-\sqrt{\bar{\alpha}_t}\mathbf{x}_0}{\sqrt{1-\bar{\alpha}_t}}
+\right)\\
+&= \frac{1}{\sqrt{\alpha_t}}\left(
+\mathbf{x}_t-\frac{\beta_t}{1-\bar{\alpha}_t}\mathbf{x}_t
++\frac{\beta_t\sqrt{\bar{\alpha}_t}}{1-\bar{\alpha}_t}\mathbf{x}_0
+\right)\\
+&= \underbrace{\frac{1}{\sqrt{\alpha_t}}\left(1-\frac{\beta_t}{1-\bar{\alpha}_t}\right)}_{c_t}\mathbf{x}_t
++\underbrace{\frac{1}{\sqrt{\alpha_t}}\cdot\frac{\beta_t\sqrt{\bar{\alpha}_t}}{1-\bar{\alpha}_t}}_{d_t}\mathbf{x}_0
+\end{align*}$$
 
-公式 (23) 中的均值是直线 $\mathbf{x}_t = \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0 + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}$ 两端点的凸组合（在几何的 $\bar{\alpha}$-意义下）。它保留了与 $\mathbf{x}_0$ 对齐的分量 $\sqrt{\bar{\alpha}_{t-1}}\,\mathbf{x}_0$，并将正交（噪声）分量 $(\mathbf{x}_t - \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0)/\sqrt{1-\bar{\alpha}_t}$ 按因子 $\sqrt{1-\bar{\alpha}_{t-1}-\sigma_t^2}$ 缩放，以匹配时间 $t{-}1$ 处的目标方差。
+现在用 $\alpha_t,\bar{\alpha}_{t-1},\bar{\alpha}_t$ 重新表示系数 $c_t$ 和 $d_t$。由于 $\bar{\alpha}_t=\alpha_t\bar{\alpha}_{t-1}$，有：
 
-**命题 4.1**（DDIM 保持 DDPM 边际分布）。对公式 (23) 中 $\sigma_t^2 \in [0,\, 1-\bar{\alpha}_{t-1}]$ 的任意选择，单步边际分布保持不变：
+$$1-\bar{\alpha}_t
+=1-\alpha_t\bar{\alpha}_{t-1}
+=(1-\bar{\alpha}_{t-1})+\bar{\alpha}_{t-1}(1-\alpha_t)
+=(1-\bar{\alpha}_{t-1})+\bar{\alpha}_{t-1}\beta_t$$
 
-$$q(\mathbf{x}_t \mid \mathbf{x}_0) = \mathcal{N}\big(\mathbf{x}_t;\, \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0,\, (1-\bar{\alpha}_t)\mathbf{I}_d\big) \quad \text{对每个}\;t \tag{24}$$
+于是：
 
-> 证明通过对 $t$ 的反向归纳完成，利用全方差公式验证方差保持不变。
+$$1-\frac{\beta_t}{1-\bar{\alpha}_t}
+=\frac{1-\bar{\alpha}_t-\beta_t}{1-\bar{\alpha}_t}
+=\frac{\alpha_t(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}$$
 
-在采样时，我们用模型的逆向核来近似 $q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)$。公式 (23) 明确了随机性程度由 $\sigma_t^2$ 控制：
+因此
 
-- **确定性采样**（$\sigma_t^2 = 0$）：更新坍缩到均值：
+$$c_t=\frac{\sqrt{\bar{\alpha}_t}(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t},\quad
+d_t=\frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1-\bar{\alpha}_t}$$
 
-  $$\mathbf{x}_{t-1} = \sqrt{\bar{\alpha}_{t-1}}\,\mathbf{x}_0 + \sqrt{\frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}}\,(\mathbf{x}_t - \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0)$$
+这与我们之前通过配方法得到的闭式结果完全一致：
 
-  由于采样时 $\mathbf{x}_0$ 未知，使用标准估计器 $\hat{\mathbf{x}}_0(\mathbf{x}_t, t) = \frac{\mathbf{x}_t - \sqrt{1-\bar{\alpha}_t}\,\hat{\boldsymbol{\epsilon}}_\theta(\mathbf{x}_t, t)}{\sqrt{\bar{\alpha}_t}}$。代入 $\hat{\mathbf{x}}_0$ 产生纯确定性采样器（常见的 "DDIM $\eta=0$" 更新）。
+$$\hat{\boldsymbol{\mu}}_t^{(\text{DDPM})}(\mathbf{x}_t,\mathbf{x}_0)
+=\frac{\sqrt{\bar{\alpha}_t}(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}\mathbf{x}_t
++\frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1-\bar{\alpha}_t}\mathbf{x}_0$$
 
-- **随机采样**（$\sigma_t^2 > 0$）：$\mathbf{x}_{t-1} = \text{mean in (23)} + \sigma_t\,\mathbf{z}$，$\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_d)$。取 $\sigma_t^2 = \tilde{\beta}_t$ 恢复 DDPM；较小的 $\sigma_t^2$ 倾向于锐化结果同时保留一定的多样性。
+DDIM定义了一组替代的反向条件分布，它保留了与DDPM完全相同的单步边缘分布 $q(\mathbf{x}_t\mid\mathbf{x}_0)$，同时允许对每一步的方差 $\sigma_t^2$ 进行控制：
 
-DDIM 的一个实际好处是在**缩减的时间网格**上进行快速采样。设 $T = \tau_1 > \tau_2 > \cdots > \tau_S = 1$ 为索引的子集。仅在这些步骤上应用公式 (23)：
+$$q(\mathbf{x}_{t-1}\mid\mathbf{x}_t,\mathbf{x}_0)
+=\mathcal{N}\left(
+\mathbf{x}_{t-1};
+\sqrt{\bar{\alpha}_{t-1}}\mathbf{x}_0
++\sqrt{1-\bar{\alpha}_{t-1}-\sigma_t^2}\frac{\mathbf{x}_t-\sqrt{\bar{\alpha}_t}\mathbf{x}_0}{\sqrt{1-\bar{\alpha}_t}},
+\sigma_t^2\mathbf{I}_d
+\right) \tag{23}$$
 
-$$\mathbf{x}_{\tau_{k-1}} \sim q(\mathbf{x}_{\tau_{k-1}} \mid \mathbf{x}_{\tau_k}, \mathbf{x}_0), \quad k = S, \ldots, 2$$
+$$q(\mathbf{x}_T\mid\mathbf{x}_0)=\mathcal{N}(\mathbf{x}_T;\sqrt{\bar{\alpha}_T}\mathbf{x}_0,(1-\bar{\alpha}_T)\mathbf{I}_d)$$
 
-使用相同的训练好的 $\hat{\boldsymbol{\epsilon}}_\theta$ 和 $\hat{\mathbf{x}}_0$ 估计器。命题 4.1 保证 $q(\mathbf{x}_{\tau_k} \mid \mathbf{x}_0)$ 保持正确的边际分布 $\mathcal{N}(\sqrt{\bar{\alpha}_{\tau_k}}\,\mathbf{x}_0,\, (1-\bar{\alpha}_{\tau_k})\mathbf{I}_d)$，因此缩减的链保持一致，同时大幅减少步数。
+式(23)中的均值是直线 $\mathbf{x}_t=\sqrt{\bar{\alpha}_t}\mathbf{x}_0+\sqrt{1-\bar{\alpha}_t}\boldsymbol{\epsilon}$ 两个端点在几何意义下的凸组合：它保留了与 $\mathbf{x}_0$ 对齐的分量 $\sqrt{\bar{\alpha}_{t-1}}\mathbf{x}_0$，并将正交的噪声分量 $(\mathbf{x}_t-\sqrt{\bar{\alpha}_t}\mathbf{x}_0)/\sqrt{1-\bar{\alpha}_t}$ 按因子 $\sqrt{1-\bar{\alpha}_{t-1}-\sigma_t^2}$ 缩放，以匹配时刻 $t-1$ 处的目标方差。
 
-### 4.2 DDGAN：对抗学习的逆动力学
+若取 $\sigma_t^2=\tilde{\beta}_t:=\frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}\beta_t$，则
 
-我们描述一种替代训练策略，直接学习逆向转移，使得生成可以在远少于传统步数的情况下进行。保持前向过程及其符号不变。
+$$1-\bar{\alpha}_{t-1}-\sigma_t^2
+=(1-\bar{\alpha}_{t-1})\left(1-\frac{\beta_t}{1-\bar{\alpha}_t}\right)
+=(1-\bar{\alpha}_{t-1})\cdot\frac{\alpha_t(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}
+=\frac{\alpha_t(1-\bar{\alpha}_{t-1})^2}{1-\bar{\alpha}_t}$$
 
-对每个 $t \in \{1,\ldots,T\}$，考虑前向链下连续潜变量的联合分布：
+因此
 
-$$q_t^\text{pair}(\mathbf{x}_{t-1}, \mathbf{x}_t) := q(\mathbf{x}_t)\,q(\mathbf{x}_{t-1} \mid \mathbf{x}_t), \quad q(\mathbf{x}_t) = \int q(\mathbf{x}_t \mid \mathbf{x}_0)\,p_\text{data}(\mathbf{x}_0)\,\mathrm{d}\mathbf{x}_0$$
+$$\frac{\sqrt{1-\bar{\alpha}_{t-1}-\sigma_t^2}}{\sqrt{1-\bar{\alpha}_t}}
+=\frac{\sqrt{\bar{\alpha}_t}(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}$$
 
-时间条件生成器 $G_\theta$ 提出一步逆向：$\hat{\mathbf{x}}_{t-1} = G_\theta(\mathbf{x}_t, t, \mathbf{z})$，$\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_d)$；而判别器 $D_\phi(\cdot,\cdot,t)$ 区分真实对 $(\mathbf{x}_{t-1}, \mathbf{x}_t) \sim q_t^\text{pair}$ 和生成对 $(\hat{\mathbf{x}}_{t-1}, \mathbf{x}_t)$。
+此时式(23)的均值变为
 
-**定义 4.2**（离散时间的对抗目标）。简单的逻辑回归公式训练 $G_\theta$ 和 $D_\phi$：
+$$\sqrt{\bar{\alpha}_{t-1}}\mathbf{x}_0
++\frac{\sqrt{\bar{\alpha}_t}(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}(\mathbf{x}_t-\sqrt{\bar{\alpha}_t}\mathbf{x}_0)
+=\frac{\sqrt{\bar{\alpha}_t}(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}\mathbf{x}_t
++\frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1-\bar{\alpha}_t}\mathbf{x}_0$$
 
-$$\min_\theta \max_\phi \sum_{t=1}^{T}\Big\{\mathbb{E}_{(\mathbf{x}_{t-1},\mathbf{x}_t)\sim q_t^\text{pair}}[\log D_\phi(\mathbf{x}_{t-1}, \mathbf{x}_t, t)] + \mathbb{E}_{\mathbf{x}_t\sim q(\mathbf{x}_t),\,\mathbf{z}\sim\mathcal{N}}[\log(1-D_\phi(G_\theta(\mathbf{x}_t, t, \mathbf{z}), \mathbf{x}_t, t))]\Big\}$$
+与前面DDPM的后验均值完全一致。因此，DDPM是DDIM族中取 $\sigma_t^2=\tilde{\beta}_t$ 的特例。
 
-**命题 4.3**（学习到的逆向转移的一致性）。固定 $t$。在定义 4.2 的目标下，若时间 $t$ 处的判别器最优，则生成器更新使模型联合分布 $p_t^\theta(\mathbf{x}_{t-1}, \mathbf{x}_t) := q(\mathbf{x}_t)\,p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$ 趋向真实联合分布 $q_t^\text{pair}(\mathbf{x}_{t-1}, \mathbf{x}_t) := q(\mathbf{x}_t)\,q(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$。博弈的驻点恰好在 $p_t^\theta = q_t^\text{pair}$ 时达到。
+**命题4.1（DDIM保留DDPM边缘分布）**
+对式(23)中任意满足 $\sigma_t^2\in[0,1-\bar{\alpha}_{t-1}]$ 的取值，单步边缘分布始终为
 
-采样从 $\mathbf{x}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_d)$ 开始，迭代 $\mathbf{x}_{t-1} \leftarrow G_\theta(\mathbf{x}_t, t, \mathbf{z}_t)$。实际中在粗网格 $\{t_k\}_{k=K}^0$ 上训练，$K \ll T$，使得学到的逆向映射支持大步跳跃。
+$$q(\mathbf{x}_t\mid\mathbf{x}_0)=\mathcal{N}(\mathbf{x}_t;\sqrt{\bar{\alpha}_t}\mathbf{x}_0,(1-\bar{\alpha}_t)\mathbf{I}_d),\quad \forall t \tag{24}$$
+
+**证明**：我们对 $t$ 进行反向归纳。
+- **基例**：当 $t=T$ 时，由式(23)第二行直接成立。
+- **归纳假设**：假设命题在时刻 $t$ 成立，考虑时刻 $t-1$ 的边缘分布：
+
+$$q(\mathbf{x}_{t-1}\mid\mathbf{x}_0)
+=\int q(\mathbf{x}_{t-1}\mid\mathbf{x}_t,\mathbf{x}_0)q(\mathbf{x}_t\mid\mathbf{x}_0)d\mathbf{x}_t$$
+
+由于两项均为高斯分布，该积分仍是高斯分布。其均值为
+
+$$\boldsymbol{\mu}_{t-1}
+=\mathbb{E}_{q(\mathbf{x}_t\mid\mathbf{x}_0)}\left[
+\mathbb{E}_{q(\mathbf{x}_{t-1}\mid\mathbf{x}_t,\mathbf{x}_0)}[\mathbf{x}_{t-1}]
+\right]
+=\mathbb{E}\left[
+\sqrt{\bar{\alpha}_{t-1}}\mathbf{x}_0
++\sqrt{1-\bar{\alpha}_{t-1}-\sigma_t^2}\frac{\mathbf{x}_t-\sqrt{\bar{\alpha}_t}\mathbf{x}_0}{\sqrt{1-\bar{\alpha}_t}}
+\right]$$
+
+由归纳假设，$\mathbb{E}_{q(\mathbf{x}_t\mid\mathbf{x}_0)}[\mathbf{x}_t]=\sqrt{\bar{\alpha}_t}\mathbf{x}_0$，因此第二项期望为0，最终得到 $\boldsymbol{\mu}_{t-1}=\sqrt{\bar{\alpha}_{t-1}}\mathbf{x}_0$。
+
+对于协方差，使用全方差公式：
+
+$$\operatorname{Var}[\mathbf{x}_{t-1}\mid\mathbf{x}_0]
+=\underbrace{\mathbb{E}[\operatorname{Var}(\mathbf{x}_{t-1}\mid\mathbf{x}_t,\mathbf{x}_0)]}_{\sigma_t^2\mathbf{I}_d}
++\underbrace{\operatorname{Var}(\mathbb{E}[\mathbf{x}_{t-1}\mid\mathbf{x}_t,\mathbf{x}_0])}_{\left(\sqrt{1-\bar{\alpha}_{t-1}-\sigma_t^2}\big/\sqrt{1-\bar{\alpha}_t}\right)^2\operatorname{Var}(\mathbf{x}_t\mid\mathbf{x}_0)}$$
+
+由归纳假设，$\operatorname{Var}(\mathbf{x}_t\mid\mathbf{x}_0)=(1-\bar{\alpha}_t)\mathbf{I}_d$，因此
+
+$$\operatorname{Var}[\mathbf{x}_{t-1}\mid\mathbf{x}_0]
+=\sigma_t^2\mathbf{I}_d+(1-\bar{\alpha}_{t-1}-\sigma_t^2)\mathbf{I}_d
+=(1-\bar{\alpha}_{t-1})\mathbf{I}_d$$
+
+故 $q(\mathbf{x}_{t-1}\mid\mathbf{x}_0)=\mathcal{N}(\sqrt{\bar{\alpha}_{t-1}}\mathbf{x}_0,(1-\bar{\alpha}_{t-1})\mathbf{I}_d)$，归纳成立。证毕。
+
+在采样阶段，我们用模型的反向核去近似 $q(\mathbf{x}_{t-1}\mid\mathbf{x}_t,\mathbf{x}_0)$。式(23)清晰地表明，随机性由 $\sigma_t^2$ 控制。
+- 若取确定性采样 $\sigma_t^2=0$，更新规则退化为仅含均值项；
+- 若取随机采样 $\sigma_t^2>0$，则从对应高斯分布中采样。
+
+当 $\sigma_t^2=\tilde{\beta}_t$ 时，完全退化为DDPM采样。
+
+DDIM的一个核心实用优势是可以在简化的时间网格上快速采样。选取原时间步的一个子集，仅在这些时间步上应用式(23)，即可大幅减少采样步数，同时命题4.1保证边缘分布始终保持一致，因此整个简化后的链是自洽的。
+
+### 4.2 DDGAN：对抗学习得到的反向动力学
+
+本文提出了一种替代训练策略，该策略直接学习反向转移过程，从而使生成过程能够在极少的迭代次数内完成。我们保留"预备知识"部分中的前向过程与符号定义：$\beta_t$、$\alpha_t = 1 - \beta_t$、$\bar{\alpha}_t = \prod_{s \leq t}\alpha_s$，且
+
+$$q(\mathbf{x}_t \mid \mathbf{x}_0) = \mathcal{N}(\sqrt{\bar{\alpha}_t}\mathbf{x}_0, \, (1 - \bar{\alpha}_t)\mathbf{I}_d), \quad \mathbf{x}_t = \sqrt{\bar{\alpha}_t}\mathbf{x}_0 + \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\varepsilon}$$
+
+对于每个 $t \in \{1, \dots, T\}$，我们考虑前向链下连续隐变量的分布，即
+
+$$q_t^{\text{pair}}(\mathbf{x}_{t-1}, \mathbf{x}_t) := q(\mathbf{x}_t)q(\mathbf{x}_{t-1} \mid \mathbf{x}_t), \quad q(\mathbf{x}_t) = \int q(\mathbf{x}_t \mid \mathbf{x}_0)p_{\text{data}}(\mathbf{x}_0)d\mathbf{x}_0$$
+
+带时间条件的生成器 $G_\theta$ 会生成反向步 $\hat{\mathbf{x}}_{t-1} = G_\theta(\mathbf{x}_t, t, \mathbf{z})$，其中 $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_d)$；而判别器 $D_\phi(\cdot, \cdot, t)$ 用于区分**真实样本对** $(\mathbf{x}_{t-1}, \mathbf{x}_t) \sim q_t^{\text{pair}}$ 与**生成样本对** $(\hat{\mathbf{x}}_{t-1}, \mathbf{x}_t)$。通常不同时间步 $t$ 会共享参数，并通过显式时间嵌入（time embeddings）实现对时间的条件编码。
+
+**定义 4.2（离散时间下的对抗目标）** 一种简单的逻辑回归（logistic）损失函数用于训练生成器 $G_\theta$ 和判别器 $D_\phi$，目标函数为
+
+$$\min_{\theta} \max_{\phi} \sum_{t=1}^{T}\bigg\{ \mathbb{E}_{(\mathbf{x}_{t-1}, \mathbf{x}_t) \sim q_t^{\text{pair}}}\big[\log D_\phi(\mathbf{x}_{t-1}, \mathbf{x}_t, t)\big] + \mathbb{E}_{\mathbf{x}_t \sim q(\mathbf{x}_t), \, \mathbf{z} \sim \mathcal{N}} \big[\log\big(1 - D_\phi(G_\theta(\mathbf{x}_t, t, \mathbf{z}), \mathbf{x}_t, t)\big)\big] \bigg\}$$
+
+也可采用其他判别器损失函数，但对时间 $t$ 的条件编码方式保持不变。
+
+**命题 4.3（学习到的反向转移的一致性）**
+对任意 $t \in \{1, \dots, T\}$，在定义 4.2 的目标函数下，若时间步 $t$ 处的判别器达到最优状态，则由其诱导出的生成器更新会推动模型联合分布
+
+$$p_t^\theta(\mathbf{x}_{t-1}, \mathbf{x}_t) := q(\mathbf{x}_t)p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$$
+
+向**真实联合分布**
+
+$$q_t^{\text{pair}}(\mathbf{x}_{t-1}, \mathbf{x}_t) := q(\mathbf{x}_t)q(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$$
+
+收敛。特别地，当学习到的反向转移 $p_t^\theta$ 与前向样本对分布 $q_t^{\text{pair}}$ 相等（即 $p_t^\theta = q_t^{\text{pair}}$）时，时间步 $t$ 处的博弈达到平稳点。
+
+**证明**：在逻辑损失函数下，时间步 $t$ 处的最优判别器为
+
+$$D_t^*(\mathbf{x}_{t-1}, \mathbf{x}_t) = \frac{q_t^{\text{pair}}(\mathbf{x}_{t-1}, \mathbf{x}_t)}{q_t^{\text{pair}}(\mathbf{x}_{t-1}, \mathbf{x}_t) + p_t^\theta(\mathbf{x}_{t-1}, \mathbf{x}_t)}$$
+
+将 $D_t^*$ 代入单时间步目标函数可得
+
+$$\mathcal{L}_t(\theta) = -\log 4 + \text{KL}\left(q_t^{\text{pair}} \bigg\Vert \frac{q_t^{\text{pair}} + p_t^\theta}{2}\right) + \text{KL}\left(p_t^\theta \bigg\Vert \frac{q_t^{\text{pair}} + p_t^\theta}{2}\right)$$
+
+其中引入 $m = (q_t^{\text{pair}} + p_t^\theta)/2$ 并展开对数项即可得到该式。每个 KL 散度项均非负，且仅当两个输入分布相同时才取零值，因此 $\mathcal{L}_t(\theta) \geq -\log 4$，且等号成立当且仅当 $p_t^\theta = q_t^{\text{pair}}$。因此，生成器的更新会持续减小两个联合分布之间的差异，直至二者完全一致。
+
+**采样与训练细节**
+从 $\mathbf{x}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_d)$ 开始采样，并仅执行少量迭代步骤 $\mathbf{x}_{t-1} \leftarrow G_\theta(\mathbf{x}_t, t, \mathbf{z})$ 即可完成生成。实际训练中，我们在**粗时间网格** $\{t_k\}_{k=0}^K$ 上进行训练（满足 $K \ll T$），由此学习到的反向映射支持**大步跳跃**（large jumps）；而在推理阶段，同样使用该粗网格。通常会输出相对于 $\mathbf{x}_t$ 的残差（或采用等价的重参数化方式），而非直接预测 $\hat{\mathbf{x}}_{t-1}$。对判别器 $D_\phi$ 施加适度的正则化可提升训练稳定性；同时可引入**小噪声一致性项**（small-noise consistency terms）以鼓励与前文的高斯反向均值保持一致，且这一操作不会改变对抗训练的本质。
+
+**方法总结**
+从实际的**wall-clock采样耗时**角度来看，该方法属于**加速策略**（通过减少采样步数实现加速）；其核心是**修改训练准则**，而非改变极大似然训练模型的更新规则。典型的引导（guidance）条件约束通常通过生成器 $G_\theta$ 的输入引入（若有需要，也可对判别器 $D_\phi$ 加入条件约束）。
 
 ### 4.3 嵌套扩散模型
 
-嵌套扩散模型通过组合**多个**层次化结构的扩散链来扩展单一扩散过程。每一层在一个表示空间中精化或增强上一层的表示，所有层共同定义一个联合生成模型。
+嵌套扩散模型通过**组合多个层级化结构的扩散链**，对单一扩散过程进行扩展。每一层都会对前一层的表征进行**优化或增强**，这些层级共同构成了一个联合生成模型。本文针对从正向加噪到反向生成的全过程，展开了相关构建方法的研究。
 
-设 $\mathbf{x}_0 \in \mathcal{X}$ 为数据样本。单一扩散使用：
+设 $\mathbf{x}_0 \in \mathcal{X}$ 为一个服从数据分布 $p_{\text{data}}(\mathbf{x}_0)$ 的样本。单一扩散过程的定义如下：
 
-$$q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) = \prod_{t=1}^{T}q(\mathbf{x}_t \mid \mathbf{x}_{t-1}), \quad p_\theta(\mathbf{x}_{0:T}) = p(\mathbf{x}_T)\prod_{t=1}^{T}p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$$
+$$q(\mathbf{x}_{1:T} \mid \mathbf{x}_0) = \prod_{t=1}^T q(\mathbf{x}_t \mid \mathbf{x}_{t-1}), \quad p_\theta(\mathbf{x}_{0:T}) = p(\mathbf{x}_T) \prod_{t=1}^T p_\theta(\mathbf{x}_{t-1} \mid \mathbf{x}_t)$$
 
-嵌套扩散引入 $K$ 层，每层有自己的扩散链在一个表示空间中，层与层之间通过确定性或学习的变换连接。对第 $k$ 层（$k \in \{1,\ldots,K\}$），在时间步 $t$ 的状态记为 $\mathbf{y}_t^k$（$\mathbf{y}_t^1 = \mathbf{x}_t$，$\mathbf{y}_t^2 = \mathbf{z}_t$，等等）。每层有前向过程：
+其中包含高斯正向步骤与经学习得到的反向模型。嵌套扩散模型引入了 **$K$ 个层级**，每个层级在表征空间中都拥有独立的扩散链，并通过**确定性变换**或**经学习得到的变换**将各层级连接起来。为便于说明，我们考虑如下映射路径：
 
-$$q_k(\mathbf{y}_t^k \mid \mathbf{y}_{t-1}^k) = \mathcal{N}\big(\mathbf{y}_t^k;\, \sqrt{\alpha_t^{(k)}}\,\mathbf{y}_{t-1}^k,\, (1-\alpha_t^{(k)})\mathbf{I}\big) \tag{Eq.4-1}$$
+$$(\mathbf{x}_0, \mathbf{x}_1, \dots, \mathbf{x}_T^1) \to (\mathbf{z}_0, \mathbf{z}_1, \dots, \mathbf{z}_T^2) \to \dots \to (\mathbf{u}_0, \mathbf{u}_1, \dots, \mathbf{u}_T^K)$$
 
-每层的封闭形式边际和 DDPM 后验与单层情况相同，只是带上层索引 $(k)$：
+其中 $\mathbf{x}_0$ 为原始数据，$\mathbf{u}_T^K$ 为噪声水平最高的深层状态；中间层级的链可通过**确定性映射**（例如下采样、编码器或其他变换）得到，例如：
 
-$$q_k(\mathbf{y}_t^k \mid \mathbf{y}_0^k) = \mathcal{N}\big(\mathbf{y}_t^k;\, \sqrt{\bar{\alpha}_t^{(k)}}\,\mathbf{y}_0^k,\, (1-\bar{\alpha}_t^{(k)})\mathbf{I}\big) \tag{25}$$
+$$\mathbf{z}_0 = f_1(\mathbf{x}_0), \quad \mathbf{u}_0 = f_2(\mathbf{z}_0), \quad \dots$$
 
-$$q_k(\mathbf{y}_{t-1}^k \mid \mathbf{y}_t^k, \mathbf{y}_0^k) = \mathcal{N}\bigg(\mathbf{y}_{t-1}^k;\, \frac{1}{\sqrt{\alpha_t^{(k)}}}\Big(\mathbf{y}_t^k - \frac{\beta_t^{(k)}}{\sqrt{1-\bar{\alpha}_t^{(k)}}}\boldsymbol{\epsilon}_t^{(k)}\Big),\, \tilde{\beta}_t^{(k)}\,\mathbf{I}\bigg) \tag{26}$$
+对于第 $k \in \{1, \dots, K\}$ 个层级，我们将步骤 $t$ 处的状态记为 $\mathbf{y}_t^k$（因此 $\mathbf{y}_t^1 = \mathbf{x}_t$，$\mathbf{y}_t^2 = \mathbf{z}_t$ 等）。每个层级都拥有独立的前向过程：
 
-嵌套逆向模型跨层联合生成。常见的从粗到细分解为：
+$$q_k(\mathbf{y}_t^k \mid \mathbf{y}_{t-1}^k) = \mathcal{N}\left(\mathbf{y}_t^k; \sqrt{\alpha_t^{(k)}} \mathbf{y}_{t-1}^k, (1 - \alpha_t^{(k)}) \mathbf{I}\right), \quad \alpha_t^{(k)} = 1 - \beta_t^{(k)}, \quad \bar{\alpha}_t^{(k)} = \prod_{i=1}^t \alpha_i^{(k)}$$
 
-$$p_\theta(\mathbf{Y}^1,\ldots,\mathbf{Y}^K) = \underbrace{p(\mathbf{y}_T^K)\prod_{t=1}^{T}p_\theta(\mathbf{y}_{t-1}^K \mid \mathbf{y}_t^K, K, t)}_{\text{最深层}} \prod_{k=K-1}^{1}\underbrace{p_\theta(\mathbf{y}_0^k \mid \mathbf{y}_0^{k+1}, k)\prod_{t=1}^{T}p_\theta(\mathbf{y}_{t-1}^k \mid \mathbf{y}_t^k, \mathbf{y}_0^{k+1}, k, t)}_{\text{第 $k$ 层以第 $k{+}1$ 层为条件}} \tag{27}$$
+层级间的嵌套连接通过**初始化规则**实现，例如：
 
-训练通过最小化负对数似然的变分界进行，分解为各层各步的 KL 之和，得到实际的均方噪声匹配项：
+$$\mathbf{y}_0^k = g_k(\mathbf{Y}^{k-1}) \quad \text{或} \quad \mathbf{y}_0^k = g_k(\mathbf{y}_0^{k-1})$$
 
-$$\mathcal{L} \cong \sum_{k=1}^{K}\sum_{t=2}^{T} w_{t,k}\,\mathbb{E}\Big[\big\|\boldsymbol{\epsilon}_t^{(k)} - \hat{\boldsymbol{\epsilon}}_\theta^{(k)}(\mathbf{y}_t^k, t, k, \text{cond}_k)\big\|_2^2\Big], \quad w_{t,k} = \frac{\beta_t^{(k)}}{2(1-\beta_t^{(k)})(1-\bar{\alpha}_{t-1}^{(k)})} \tag{29}$$
+其中 $\mathbf{Y}^{k-1} = (\mathbf{y}_0^{k-1}, \dots, \mathbf{y}_T^{k-1})$，$\mathbf{Y}^k = (\mathbf{y}_0^k, \dots, \mathbf{y}_T^k)$。
+
+联合前向分布可进行如下因式分解：
+
+$$q(\mathbf{Y}^1, \dots, \mathbf{Y}^K) = q_1(\mathbf{Y}^1) \prod_{k=2}^K q_k(\mathbf{Y}^k \mid \mathbf{Y}^{k-1})$$
+
+其中
+
+$$q_1(\mathbf{Y}^1) = p_{\text{data}}(\mathbf{x}_0) \prod_{t=1}^T q_1(\mathbf{x}_t \mid \mathbf{x}_{t-1}), \quad q_k(\mathbf{Y}^k \mid \mathbf{Y}^{k-1}) = \delta(\mathbf{y}_0^k - g_k(\mathbf{Y}^{k-1})) \prod_{t=1}^T q_k(\mathbf{y}_t^k \mid \mathbf{y}_{t-1}^k)$$
+
+这里 $\delta(\cdot)$ 函数强制第 $k$ 层的初始化由第 $k-1$ 层决定。与单层级情况类似，每个层级都存在闭式边缘分布：
+
+$$q_k(\mathbf{y}_t^k \mid \mathbf{y}_0^k) = \mathcal{N}\left(\mathbf{y}_t^k; \sqrt{\bar{\alpha}_t^{(k)}} \mathbf{y}_0^k, (1 - \bar{\alpha}_t^{(k)}) \mathbf{I}\right) \tag{25}$$
+
+以及DDPM后验分布：
+
+$$q_k(\mathbf{y}_{t-1}^k \mid \mathbf{y}_t^k, \mathbf{y}_0^k) = \mathcal{N}\left(\mathbf{y}_{t-1}^k; \frac{1}{\sqrt{\alpha_t^{(k)}}}\left(\mathbf{y}_t^k - \frac{\beta_t^{(k)}}{\sqrt{1 - \bar{\alpha}_t^{(k)}}} \boldsymbol{\epsilon}_t^{(k)}\right), \tilde{\beta}_t^{(k)} \mathbf{I}\right), \quad \tilde{\beta}_t^{(k)} := \frac{1 - \bar{\alpha}_{t-1}^{(k)}}{1 - \bar{\alpha}_t^{(k)}} \beta_t^{(k)} \tag{26}$$
+
+嵌套反向模型支持跨层级的联合生成。一种常见的**由粗到细**（coarse-to-fine）因式分解方式为：
+
+$$p_\theta(\mathbf{Y}^1, \dots, \mathbf{Y}^K) = p(\mathbf{y}_T^K) \prod_{t=1}^T p_\theta(\mathbf{y}_{t-1}^K \mid \mathbf{y}_t^K, K, t) \prod_{k=K-1}^1 \prod_{t=1}^T p_\theta(\mathbf{y}_{t-1}^k \mid \mathbf{y}_t^k, \mathbf{y}_0^{k+1}, k, t) \tag{27}$$
+
+其中 $p(\mathbf{y}_T^K) = \mathcal{N}(\mathbf{0}, \mathbf{I})$。跨层级项 $p_\theta(\mathbf{y}_0^k \mid \mathbf{y}_0^{k+1}, k)$ 起到**上采样器/解码器**的作用（可以是确定性的或经学习得到的）。每一层级的反向转换均为高斯分布，其参数化方式与前文一致，并通过噪声预测实现：
+
+$$p_\theta(\mathbf{y}_{t-1}^k \mid \mathbf{y}_t^k, \cdot) = \mathcal{N}\left(\mathbf{y}_{t-1}^k; \mu_\theta^{(k)}(\mathbf{y}_t^k, \cdot), \sigma_{t,k}^2 \mathbf{I}\right) \tag{28}$$
+
+其中
+
+$$\mu_\theta^{(k)}(\mathbf{y}_t^k, \cdot) = \frac{1}{\sqrt{\alpha_t^{(k)}}}\left(\mathbf{y}_t^k - \frac{\beta_t^{(k)}}{\sqrt{1 - \bar{\alpha}_t^{(k)}}} \hat{\boldsymbol{\epsilon}}_\theta^{(k)}(\mathbf{y}_t^k, t, k, \mathbf{y}_0^{k+1})\right)$$
+
+若取 $\sigma_{t,k}^2 = \tilde{\beta}_t^{(k)}$ 则可恢复DDPM情况，也可选择其他参数（例如DDIM风格）以实现加速采样。
+
+**典型生成路径**：
+1. 采样 $\mathbf{y}_T^K \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$；在第 $K$ 层执行反向扩散以得到 $\mathbf{y}_0^K$。
+2. 通过 $\mathbf{y}_0^{K-1} \sim p_\theta(\mathbf{y}_0^{K-1} \mid \mathbf{y}_0^K, K-1)$ 生成下一层级的条件（若为确定性过程，则 $\mathbf{y}_0^{K-1} = g_{K-1}^{-1}(\mathbf{y}_0^K)$）。
+3. 对第 $K-1$ 层进行噪声初始化（$\mathbf{y}_T^{K-1} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$），并在以 $\mathbf{y}_0^K$ 为条件的情况下执行反向扩散，得到 $\mathbf{y}_0^{K-1}$。
+4. 重复上述步骤直至第1层，最终获得 $\mathbf{y}_0^1 = \mathbf{x}_0$。
+
+也可采用其他顺序（如由细到粗）；核心设计在于**确定性/经学习得到的跨层级映射**的放置位置（位于每条扩散链的起点或终点）。
+
+训练过程通过最小化**负对数似然的变分上界**实现：
+
+$$\mathcal{L} = \text{KL}\left(q(\mathbf{Y}^1, \dots, \mathbf{Y}^K) \parallel p_\theta(\mathbf{Y}^1, \dots, \mathbf{Y}^K)\right)$$
+
+与单层级情况类似，该目标可分解为各层级上每步KL散度的和，从而产生实用的**均值平方噪声匹配项**：
+
+$$\mathcal{L} \cong \sum_{k=1}^K \sum_{t=1}^T w_{t,k} \mathbb{E}\left[\left\|\boldsymbol{\epsilon}_t^{(k)} - \hat{\boldsymbol{\epsilon}}_\theta^{(k)}(\mathbf{y}_t^k, t, k, \text{cond}_k)\right\|_2^2\right], \quad w_{t,k} = \frac{\beta_t^{(k)}}{2(1 - \beta_t^{(k)})(1 - \bar{\alpha}_{t-1}^{(k)})} \tag{29}$$
+
+其中 $\boldsymbol{\epsilon}_t^{(k)}$ 为注入第 $k$ 层的真实高斯噪声，$\text{cond}_k$ 表示任意跨层级条件（例如 $\mathbf{y}_0^{k+1}$）。权重 $w_{t,k}$ 与前文一致，用于确保跨时间步的**尺度一致性**。
+
+一种直观的视角是：每个层级处理不同的**尺度**或**潜表征**。以两层级为例，设：
+
+$$\mathbf{z}_0 = f(\mathbf{x}_0)$$
+
+其中 $f$ 为确定性下采样器/编码器。在粗空间 $\mathbf{z}_0$ 上运行扩散过程 $q_2(\mathbf{z}_{1:T} \mid \mathbf{z}_0)$，进行反向扩散以得到 $\mathbf{z}_0$，随后通过解码器（确定性或经学习得到）将 $\mathbf{z}_0$ 映射回数据空间。
+
+接着对 $\mathbf{x}$ 运行/条件化第二条扩散链：
+
+$$q_1(\mathbf{x}_{1:T} \mid \mathbf{x}_0), \quad q_2(\mathbf{z}_{1:T} \mid \mathbf{z}_0)$$
+
+其中跨层级连接为 $\mathbf{z}_0 = f(\mathbf{x}_0)$ 且 $p_\theta(\mathbf{x}_0 \mid \mathbf{z}_0)$。
+
+整体联合前向分布仍可按前文方式进行因式分解，每个尺度的轨迹都建立在前一尺度的状态之上。
+
+跨层级条件分布 $p_\theta(\mathbf{y}_0^k \mid \mathbf{y}_0^{k+1})$ 可以是**确定性的**（例如上采样）或**经学习得到的**（例如条件解码器）。在采样/推导得到 $\mathbf{y}_0^k$ 后，可采用以下两种方式之一：
+- (i) 设 $\mathbf{y}_T^k \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$，并运行反向链 $p_\theta(\mathbf{y}_{t-1}^k \mid \mathbf{y}_t^k, \mathbf{y}_0^{k+1})$ 直至得到 $\mathbf{y}_0^k$；
+- (ii) 在第 $k$ 层使用DDIM风格的**降步采样器**，并采用相同的累积调度 $\bar{\alpha}_t^{(k)}$ 以提升效率。
+
+在所有情况下，参数化方式（公式28）结合累积项 $\bar{\alpha}_t^{(k)}$ 都能保证符号与机制与前文提出的**单层级扩散模型保持一致**。
 
 ### 4.4 Stable Diffusion
 
-Stable Diffusion 是一种**潜在扩散**方法：不直接在像素空间运行扩散，而是先将数据映射到低维潜在空间，在那里去噪成本更低；采样后，解码器将最终潜变量映射回数据域。
+Stable Diffusion 是一种**潜扩散（latent diffusion）方法**：它不再直接在像素空间中运行扩散过程，而是先将数据映射到更低维度的潜空间中，在潜空间中执行去噪的计算成本更低；采样完成后，再通过解码器将最终的潜变量映射回数据域。
 
-设 $\mathbf{x}_0 \in \mathbb{R}^{H \times W \times C}$ 取自 $p_\text{data}(\mathbf{x}_0)$。训练好的编码器-解码器 $(E, D)$，其中 $(h,w,c) \ll (H,W,C)$，定义：
+设 $\mathbf{x}_0 \in \mathbb{R}^{H \times W \times C}$ 是从数据分布 $p_{\text{data}}(\mathbf{x}_0)$ 中采样得到的样本。一个训练好的编码器-解码器结构 $(E, D)$，其输出维度满足 $(h, w, c) \ll (H, W, C)$，定义如下：
 
 $$E: \mathbb{R}^{H \times W \times C} \to \mathbb{R}^{h \times w \times c}, \quad D: \mathbb{R}^{h \times w \times c} \to \mathbb{R}^{H \times W \times C}, \quad \mathbf{z}_0 := E(\mathbf{x}_0), \quad \tilde{\mathbf{x}}_0 := D(\mathbf{z}_0)$$
 
-将 $\mathbf{z}_0$ 视为扩散的"数据"。展平后潜变量在 $\mathbb{R}^d$（$d = h \cdot w \cdot c$）中。潜在前向链是线性高斯的：
+我们将 $\mathbf{z}_0$ 作为扩散过程的"数据"。将其展平后，潜变量位于 $\mathbb{R}^d$ 空间中，其中 $d = hwc$。沿用前文相同的调度符号，令 $\alpha_t := 1 - \beta_t$，$\bar{\alpha}_t := \prod_{i=1}^t \alpha_i$，则潜空间的前向链为线性高斯分布：
 
-$$q(\mathbf{z}_{1:T} \mid \mathbf{z}_0) = \prod_{t=1}^{T}q(\mathbf{z}_t \mid \mathbf{z}_{t-1}), \quad q(\mathbf{z}_t \mid \mathbf{z}_{t-1}) = \mathcal{N}\big(\mathbf{z}_t;\, \sqrt{\alpha_t}\,\mathbf{z}_{t-1},\, \beta_t\,\mathbf{I}_d\big) \tag{30}$$
+$$q(\mathbf{z}_{1:T} \mid \mathbf{z}_0) = \prod_{t=1}^T q(\mathbf{z}_t \mid \mathbf{z}_{t-1}), \quad q(\mathbf{z}_t \mid \mathbf{z}_{t-1}) = \mathcal{N}\left(\mathbf{z}_t; \sqrt{\alpha_t} \mathbf{z}_{t-1}, \beta_t \mathbf{I}_d\right) \tag{30}$$
 
-这意味着封闭形式的边际和重参数化：
+由此可推导出闭式边缘分布及其重参数化形式：
 
-$$q(\mathbf{z}_t \mid \mathbf{z}_0) = \mathcal{N}\big(\mathbf{z}_t;\, \sqrt{\bar{\alpha}_t}\,\mathbf{z}_0,\, (1-\bar{\alpha}_t)\mathbf{I}_d\big), \quad \mathbf{z}_t = \sqrt{\bar{\alpha}_t}\,\mathbf{z}_0 + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_d) \tag{31}$$
+$$q(\mathbf{z}_t \mid \mathbf{z}_0) = \mathcal{N}\left(\mathbf{z}_t; \sqrt{\bar{\alpha}_t} \mathbf{z}_0, (1 - \bar{\alpha}_t) \mathbf{I}_d\right), \quad \mathbf{z}_t = \sqrt{\bar{\alpha}_t} \mathbf{z}_0 + \sqrt{1 - \bar{\alpha}_t} \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_d) \tag{31}$$
 
-精确单步后验与像素空间的完全镜像，只是现在在潜在空间中：
+由于式(30)是线性高斯分布，因此精确的单步后验分布与像素空间的DDPM后验分布完全一致，仅作用域变为潜空间：
 
-$$q(\mathbf{z}_{t-1} \mid \mathbf{z}_t, \mathbf{z}_0) = \mathcal{N}\bigg(\mathbf{z}_{t-1};\, \frac{1}{\sqrt{\alpha_t}}\Big(\mathbf{z}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\boldsymbol{\epsilon}_t\Big),\, \tilde{\beta}_t\,\mathbf{I}_d\bigg) \tag{32}$$
+$$q(\mathbf{z}_{t-1} \mid \mathbf{z}_t, \mathbf{z}_0) = \mathcal{N}\left(\mathbf{z}_{t-1}; \frac{1}{\sqrt{\alpha_t}}\left(\mathbf{z}_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t\right), \tilde{\beta}_t \mathbf{I}_d\right), \quad \tilde{\beta}_t := \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t} \beta_t, \quad \boldsymbol{\epsilon}_t = \frac{\mathbf{z}_t - \sqrt{\bar{\alpha}_t} \mathbf{z}_0}{\sqrt{1 - \bar{\alpha}_t}} \tag{32}$$
 
-生成过程在终端噪声水平采样高斯先验，然后用学到的均值（通过噪声预测）和选择的逐步方差逆向链：
+生成过程从终端噪声水平的高斯先验开始采样，通过学习得到的均值（基于噪声预测）和选定的每步方差，反向执行该链：
 
-$$p_\theta(\mathbf{z}_{0:T}) = p(\mathbf{z}_T)\prod_{t=1}^{T}p_\theta(\mathbf{z}_{t-1} \mid \mathbf{z}_t), \quad p(\mathbf{z}_T) = \mathcal{N}(\mathbf{0}, \mathbf{I}_d)$$
+$$p_\theta(\mathbf{z}_{0:T}) = p(\mathbf{z}_T) \prod_{t=1}^T p_\theta(\mathbf{z}_{t-1} \mid \mathbf{z}_t), \quad p(\mathbf{z}_T) = \mathcal{N}(\mathbf{0}, \mathbf{I}_d)$$
 
-$$p_\theta(\mathbf{z}_{t-1} \mid \mathbf{z}_t) = \mathcal{N}\bigg(\mathbf{z}_{t-1};\, \underbrace{\frac{1}{\sqrt{\alpha_t}}\Big(\mathbf{z}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\hat{\boldsymbol{\epsilon}}_\theta(\mathbf{z}_t, t)\Big)}_{\mu_\theta(\mathbf{z}_t, t)},\, \sigma_t^2\,\mathbf{I}_d\bigg), \quad \sigma_t^2 \in \{\tilde{\beta}_t,\, 0\}\;\text{(DDPM 或 DDIM)} \tag{33}$$
+$$p_\theta(\mathbf{z}_{t-1} \mid \mathbf{z}_t) = \mathcal{N}\left(\mathbf{z}_{t-1}; \underbrace{\frac{1}{\sqrt{\alpha_t}}\left(\mathbf{z}_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}} \hat{\boldsymbol{\epsilon}}_\theta(\mathbf{z}_t, t)\right)}_{\mu_\theta(\mathbf{z}_t, t)}, \sigma_t^2 \mathbf{I}_d\right), \quad \sigma_t^2 \in \{\tilde{\beta}_t, 0\} \ (\text{DDPM 或 DDIM 采样}) \tag{33}$$
 
-在 $\mathbf{x} \mapsto \mathbf{z}$ 的替换之后，这与前面章节的参数化完全相同。若使用条件信息（如文本），只需将 $\hat{\boldsymbol{\epsilon}}_\theta$ 增广为 $\hat{\boldsymbol{\epsilon}}_\theta(\mathbf{z}_t, t, \cdot)$；引导机制在第 6 节详述。
+这正是前文参数化形式在将 $\mathbf{x} \mapsto \mathbf{z}$ 替换后的结果。如果使用条件生成（例如文本条件），只需将 $\hat{\boldsymbol{\epsilon}}_\theta$ 扩展为 $\hat{\boldsymbol{\epsilon}}_\theta(\mathbf{z}_t, t, \cdot)$ 即可；相关机制将在后续第6节详细展开。
 
-潜在空间的训练遵循相同的 ELBO/KL 分解，得到加权噪声匹配：
+潜空间的训练遵循相同的ELBO/KL分解，结合式(31)的前向重参数化，得到加权噪声匹配损失：
 
-$$\mathcal{L}_\text{LDM} \cong \mathbb{E}_{\mathbf{z}_0, t, \boldsymbol{\epsilon}}\Big[w_t\,\big\|\boldsymbol{\epsilon} - \hat{\boldsymbol{\epsilon}}_\theta(\mathbf{z}_t, t)\big\|_2^2\Big], \quad \mathbf{z}_t = \sqrt{\bar{\alpha}_t}\,\mathbf{z}_0 + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}, \quad w_t = \frac{\beta_t}{2(1-\beta_t)(1-\bar{\alpha}_{t-1})} \tag{34}$$
+$$\mathcal{L}_{\text{LDM}} \cong \mathbb{E}_{\mathbf{z}_0, t, \boldsymbol{\epsilon}} \left[ w_t \left\| \boldsymbol{\epsilon} - \hat{\boldsymbol{\epsilon}}_\theta(\mathbf{z}_t, t) \right\|_2^2 \right], \quad \mathbf{z}_t = \sqrt{\bar{\alpha}_t} \mathbf{z}_0 + \sqrt{1 - \bar{\alpha}_t} \boldsymbol{\epsilon}, \quad w_t = \frac{\beta_t}{2(1 - \beta_t)(1 - \bar{\alpha}_{t-1})} \tag{34}$$
 
-逆向过程生成 $\hat{\mathbf{z}}_0$ 后，解码器重建数据空间的输出：
+任何不改变贝叶斯最优预测器的等价加权方式都是可接受的；上述形式是为了与前文像素空间的推导保持一致。
+
+反向过程得到 $\hat{\mathbf{z}}_0$ 后，解码器将其重构为数据空间的输出：
 
 $$\hat{\mathbf{x}}_0 = D(\hat{\mathbf{z}}_0) \tag{35}$$
 
+在潜空间中运行，将计算集中在由 $(E, D)$ 学习到的语义结构化特征上，在完整保留扩散数学原理（前向边缘分布、真实后验、反向参数化）的同时，大幅降低了采样成本。
 
-> **核心洞见**：在潜空间中操作，使计算集中在由 $(E, D)$ 学习到的语义结构化特征上。扩散的数学（前向边际、真实后验、逆向参数化）完全保持不变，而采样代价大幅降低。
+**核心原理**：
+- 编码器 $E$ 把高维图像压缩到低维潜空间，大幅降低计算量
+- 扩散模型仅在潜空间训练和采样，计算成本仅为像素空间DDPM的约1/8（以4倍下采样为例）
+- 解码器 $D$ 把采样后的潜变量还原为高清图像，同时保留生成质量
+
+**关键符号对照表**：
+
+| 符号 | 含义 |
+|------|------|
+| $\mathbf{x}_0$ | 原始高维图像（像素空间） |
+| $\mathbf{z}_0$ | 编码器输出的低维潜变量 |
+| $E/D$ | 预训练的编码器/解码器 |
+| $\hat{\boldsymbol{\epsilon}}_\theta$ | 噪声预测UNet模型 |
+| $\sigma_t^2$ | 采样方差，$\sigma_t^2=\tilde{\beta}_t$ 对应DDPM，$\sigma_t^2=0$ 对应DDIM |
+| $\mathcal{L}_{\text{LDM}}$ | 潜扩散模型的训练损失 |
+
+**与传统DDPM的对比**：
+
+| 特性 | 像素空间DDPM | Stable Diffusion（潜扩散） |
+|------|--------------|---------------------------|
+| 计算空间 | 原始像素（高维） | 压缩后的潜空间（低维） |
+| 采样速度 | 慢（1000步，计算量大） | 快（50步，计算量小） |
+| 显存占用 | 极高（需处理全分辨率图像） | 大幅降低（仅处理潜变量） |
+| 生成质量 | 高 | 相当，同时支持高清生成 |
+| 条件扩展 | 困难 | 易扩展（文本、图像等条件） |
 
 ---
 
