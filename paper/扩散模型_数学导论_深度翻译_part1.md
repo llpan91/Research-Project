@@ -100,6 +100,279 @@ $$\hat{\boldsymbol{\epsilon}}_\lambda = \hat{\boldsymbol{\epsilon}}_\text{uncond
 
 对应的得分形式为 $s_t^{(\lambda)}(\mathbf{x}) = -(1/\sqrt{1-\bar{\alpha}_t})\,\hat{\boldsymbol{\epsilon}}_\lambda(\mathbf{x}, t, \mathbf{c})$。在讨论潜在空间方法时，潜变量记为 $\mathbf{z}_t$，被当作高斯密度内部的向量处理（隐式展平）。
 
+### 全文公式符号汇总
+
+#### 一、基础数学记号
+
+| 符号 | 含义 |
+|------|------|
+| $\mathbb{R}^d$ | $d$ 维实数空间 |
+| $\mathbf{x}, \mathbf{z}, \mathbf{u}$ | 粗体小写表示向量 |
+| $\boldsymbol{\Sigma}, \mathbf{A}, \mathbf{B}$ | 粗体大写表示矩阵 |
+| $\mathbf{I}_d$ / $\mathbf{I}$ | $d \times d$ 单位矩阵（维度明确时省略下标） |
+| $\|\cdot\|_2$ | 欧几里得范数（L2 范数） |
+| $\langle\cdot,\cdot\rangle$ | 向量内积 |
+| $(\cdot)^\top$ | 转置 |
+| $\boldsymbol{\Sigma}^{-1}$ | 协方差逆矩阵（精度矩阵） |
+| $\boldsymbol{\Sigma} \succ \mathbf{0}$ | 矩阵正定 |
+
+#### 二、矩阵运算符号
+
+| 符号 | 含义 | 首次出现 |
+|------|------|----------|
+| $\text{tr}(\mathbf{A})$ | 矩阵的迹，$= \sum_i A_{ii}$ | §2.2 |
+| $\det(\mathbf{A})$ | 行列式 | §1 |
+| $\Delta_\mathbf{x}$ | 拉普拉斯算子，$= \nabla_\mathbf{x} \cdot \nabla_\mathbf{x}$ | §5.1 |
+| $\nabla_\mathbf{x}$ | 关于 $\mathbf{x}$ 的梯度算子 | §5.1 |
+| $\nabla_\mathbf{x} \cdot$ | 散度算子 | §5.1 |
+
+#### 三、概率与统计基础
+
+| 符号 | 含义 |
+|------|------|
+| $\mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma})$ | 均值 $\boldsymbol{\mu}$、协方差 $\boldsymbol{\Sigma}$ 的多元高斯分布 |
+| $\boldsymbol{\mu}$ | 高斯分布的均值向量 |
+| $\boldsymbol{\Sigma}$ | 协方差矩阵（对称正定） |
+| $\sigma^2$ | 各向同性方差标量，$\boldsymbol{\Sigma} = \sigma^2\mathbf{I}$ |
+| $\mathbb{E}[\cdot]$ | 期望算子 |
+| $\text{Var}[\cdot]$ | 方差 |
+| $\text{Cov}[\cdot]$ | 协方差 |
+| $\text{KL}(P\|Q)$ | 从 $P$ 到 $Q$ 的 KL 散度 |
+| $\text{law}(\mathbf{X})$ | 随机向量 $\mathbf{X}$ 的分布律 |
+| $p(\mathbf{x})$, $q(\mathbf{x})$ | 概率密度函数 |
+| $p_\text{data}$ | 真实数据分布 |
+| $\delta(\cdot)$ | Dirac delta 函数（强制确定性约束，§4.3） |
+
+#### 四、高斯预备知识（§2）
+
+| 符号 | 含义 | 出处 |
+|------|------|------|
+| $(\mathbf{x}-\boldsymbol{\mu})^\top \boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol{\mu})$ | 马氏距离（二次型） | §2.1 |
+| $\boldsymbol{\Lambda}$ | 精度矩阵，配方引理中 $\boldsymbol{\Lambda} = \boldsymbol{\Sigma}_p^{-1} + \boldsymbol{\Sigma}_q^{-1}$ | §2.4 引理 2.10 |
+| $\boldsymbol{\eta}$ | 自然参数，$\boldsymbol{\eta} = \boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}$ | §2.4 引理 2.10 |
+| $\mathbf{z}$ | 标准正态噪声，$\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_d)$ | §2.3 |
+| $\mathbf{x} = \boldsymbol{\mu} + \mathbf{A}\mathbf{z}$ | 仿射重参数化 $\Rightarrow \mathbf{x} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{A}\mathbf{A}^\top)$ | §2.3 |
+| $\boldsymbol{\mu}_P, \boldsymbol{\Sigma}_P, \boldsymbol{\mu}_Q, \boldsymbol{\Sigma}_Q$ | KL 散度中两个分布的参数 | §2.5 |
+| $\sigma_{P,i}^2, \sigma_{Q,i}^2$ | 对角情形下第 $i$ 分量方差 | §2.5 |
+
+#### 五、扩散模型核心（§3）
+
+**数据与状态**
+
+| 符号 | 含义 |
+|------|------|
+| $\mathbf{x}_0$ | 原始干净数据，$\mathbf{x}_0 \sim p_\text{data}$ |
+| $\mathbf{x}_t$ | 时间步 $t$ 的加噪状态，$t \in \{1,\ldots,T\}$ |
+| $\mathbf{x}_{1:T}$ | 全部中间状态 $(\mathbf{x}_1, \ldots, \mathbf{x}_T)$ |
+| $T$ | 总扩散步数 |
+
+**噪声调度**
+
+| 符号 | 定义 | 含义 |
+|------|------|------|
+| $\beta_t$ | 预设超参数 | 第 $t$ 步噪声水平，$\beta_t \in (0,1)$，递增 |
+| $\alpha_t$ | $:= 1 - \beta_t$ | 单步信号保留率 |
+| $\bar{\alpha}_t$ | $:= \prod_{i=1}^{t} \alpha_i$ | 累积信号保留率，随 $t$ 递减趋近 0 |
+| $\text{SNR}_t$ | $:= \bar{\alpha}_t / (1-\bar{\alpha}_t)$ | 信噪比 |
+| $\ell_t$ | $:= \log \text{SNR}_t$ | 对数信噪比 |
+
+**前向过程**
+
+| 符号 | 含义 | 关键公式 |
+|------|------|----------|
+| $q(\mathbf{x}_{1:T} \mid \mathbf{x}_0)$ | 前向联合分布 | $= \prod_{t=1}^T q(\mathbf{x}_t \mid \mathbf{x}_{t-1})$ |
+| $q(\mathbf{x}_t \mid \mathbf{x}_{t-1})$ | 单步转移核 | $= \mathcal{N}(\sqrt{\alpha_t}\,\mathbf{x}_{t-1},\, \beta_t\mathbf{I})$ |
+| $q(\mathbf{x}_t \mid \mathbf{x}_0)$ | 封闭形式边际 | $= \mathcal{N}(\sqrt{\bar{\alpha}_t}\,\mathbf{x}_0,\, (1-\bar{\alpha}_t)\mathbf{I})$ |
+| $\boldsymbol{\epsilon}$ | 标准高斯噪声 | $\sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ |
+
+**逆过程与后验**
+
+| 符号 | 含义 |
+|------|------|
+| $p_\theta(\cdot)$ | 学习的逆向分布，$\theta$ 为模型参数 |
+| $q(\mathbf{x}_{t-1} \mid \mathbf{x}_t, \mathbf{x}_0)$ | 真实后验（DDPM 后验） |
+| $\hat{\boldsymbol{\mu}}(\mathbf{x}_t, \mathbf{x}_0)$ | 后验均值，有 $\mathbf{x}_0$-形式和 $\boldsymbol{\epsilon}$-形式 |
+| $\tilde{\beta}_t$ | 后验方差，$:= \frac{(1-\bar{\alpha}_{t-1})}{(1-\bar{\alpha}_t)}\beta_t$ |
+| $\hat{\boldsymbol{\epsilon}}_\theta(\mathbf{x}_t, t)$ | 神经网络噪声预测器 |
+| $\mu_\theta(\mathbf{x}_t, t)$ | 模型参数化逆向均值，$= \frac{1}{\sqrt{\alpha_t}}\big(\mathbf{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\hat{\boldsymbol{\epsilon}}_\theta\big)$ |
+| $\sigma_t^2$ | 逆向步方差，$\in \{\tilde{\beta}_t, 0\}$（DDPM / DDIM） |
+| $\hat{\mathbf{x}}_0(\mathbf{x}_t, t)$ | $x_0$-预测，$= \frac{\mathbf{x}_t - \sqrt{1-\bar{\alpha}_t}\hat{\boldsymbol{\epsilon}}_\theta}{\sqrt{\bar{\alpha}_t}}$ |
+
+**损失函数**
+
+| 符号 | 含义 |
+|------|------|
+| VB / ELBO | 变分界 / 证据下界 |
+| $\boldsymbol{\epsilon}_t$ | 第 $t$ 步实际添加的真实噪声 |
+| $\hat{\boldsymbol{\epsilon}}_t$ | 模型对噪声的预测 |
+| $\|\boldsymbol{\epsilon}_t - \hat{\boldsymbol{\epsilon}}_t\|_2^2$ | 噪声预测 MSE（核心训练目标） |
+| $w_t = \frac{\beta_t}{2(1-\beta_t)(1-\bar{\alpha}_{t-1})}$ | 各时间步 KL 散度权重 |
+
+#### 六、加速方法（§4）
+
+**DDIM（§4.1）**
+
+| 符号 | 含义 |
+|------|------|
+| $\hat{\boldsymbol{\mu}}_t^{(\text{DDPM})}$ | DDPM 后验均值 |
+| $c_t, d_t$ | DDPM 均值中 $\mathbf{x}_t$ 和 $\mathbf{x}_0$ 的系数 |
+| $\sigma_t^2 \in [0, 1-\bar{\alpha}_{t-1}]$ | DDIM 可调方差（$0$ 为确定性，$\tilde{\beta}_t$ 还原 DDPM） |
+| $\eta$ | DDIM 随机性参数 |
+
+**DDGAN（§4.2）**
+
+| 符号 | 含义 |
+|------|------|
+| $G_\theta(\mathbf{x}_t, t, \mathbf{z})$ | 带时间条件的生成器 |
+| $D_\phi(\cdot, \cdot, t)$ | 判别器 |
+| $q_t^{\text{pair}}(\mathbf{x}_{t-1}, \mathbf{x}_t)$ | 真实联合分布 |
+| $p_t^\theta(\mathbf{x}_{t-1}, \mathbf{x}_t)$ | 模型联合分布 |
+| $D_t^*$ | 最优判别器 |
+
+**嵌套扩散（§4.3）**
+
+| 符号 | 含义 |
+|------|------|
+| $K$ | 嵌套层级数 |
+| $\mathbf{y}_t^k$ | 第 $k$ 层第 $t$ 步状态（$\mathbf{y}^1 = \mathbf{x}$，$\mathbf{y}^2 = \mathbf{z}$，…） |
+| $\mathbf{Y}^k$ | 第 $k$ 层完整轨迹 |
+| $\alpha_t^{(k)}, \beta_t^{(k)}, \bar{\alpha}_t^{(k)}, \tilde{\beta}_t^{(k)}$ | 第 $k$ 层噪声调度与后验方差 |
+| $\boldsymbol{\epsilon}_t^{(k)}, \hat{\boldsymbol{\epsilon}}_\theta^{(k)}$ | 第 $k$ 层真实/预测噪声 |
+| $g_k(\cdot)$ | 层级间连接映射 |
+| $\mu_\theta^{(k)}, \sigma_{t,k}^2$ | 第 $k$ 层逆向均值和方差 |
+| $w_{t,k}$ | 第 $k$ 层第 $t$ 步损失权重 |
+| $\text{cond}_k$ | 跨层级条件信息 |
+
+**Stable Diffusion / 潜扩散（§4.4）**
+
+| 符号 | 含义 |
+|------|------|
+| $\mathbf{x}_0 \in \mathbb{R}^{H \times W \times C}$ | 原始高维图像 |
+| $E$ | 编码器，$\mathbb{R}^{H \times W \times C} \to \mathbb{R}^{h \times w \times c}$ |
+| $D$ | 解码器，$\mathbb{R}^{h \times w \times c} \to \mathbb{R}^{H \times W \times C}$ |
+| $\mathbf{z}_0 := E(\mathbf{x}_0)$ | 潜变量 |
+| $\hat{\mathbf{z}}_0$ | 逆向生成的潜变量 |
+| $\hat{\mathbf{x}}_0 = D(\hat{\mathbf{z}}_0)$ | 最终生成图像 |
+| $d = hwc$ | 潜空间展平维度 |
+| $\mathcal{L}_{\text{LDM}}$ | 潜扩散训练损失 |
+
+#### 七、流匹配（§5）
+
+**连续时间基础**
+
+| 符号 | 含义 |
+|------|------|
+| $t \in [0, T]$ | 连续时间变量 |
+| $\mathbf{X}_t$ | 连续时间状态 |
+| $\mathbf{W}_t$ | 布朗运动（维纳过程） |
+| $\mathbf{f}(\mathbf{x}, t)$ | SDE 漂移项 |
+| $g(t)$ | SDE 扩散系数 |
+| $\mathrm{d}\mathbf{X}_t = \mathbf{f}\,\mathrm{d}t + g\,\mathrm{d}\mathbf{W}_t$ | 前向扩散 SDE |
+| $p_t$ | 时刻 $t$ 的密度 |
+| $\beta(t)$ | 连续时间噪声率（VP 过程） |
+
+**得分与概率流 ODE**
+
+| 符号 | 含义 |
+|------|------|
+| $s_t(\mathbf{x})$ | 得分函数，$:= \nabla_\mathbf{x} \log p_t(\mathbf{x})$ |
+| $\mathbf{v}(\mathbf{x}, t)$ | 概率流 ODE 速度，$= \mathbf{f} - \frac{g^2}{2}s_t(\mathbf{x})$ |
+| $\mathbf{v}_{\text{PF}}(\mathbf{x}, t)$ | VP 概率流速度，$= -\frac{\beta(t)}{2}(\mathbf{x} + s_t(\mathbf{x}))$ |
+| $\partial_t p_t = -\nabla \cdot (p_t \mathbf{v})$ | 连续性方程（Liouville 方程） |
+
+**流匹配训练**
+
+| 符号 | 含义 |
+|------|------|
+| $\mathbf{v}_\theta(\mathbf{x}, t)$ | 学习的速度场 |
+| $\pi(\mathbf{x}_0, \mathbf{x}_T)$ | 耦合（$p_0$ 和 $p_T$ 的联合分布） |
+| $\psi_t(\mathbf{x}_0, \mathbf{x}_T)$ | 随机插值映射，$\psi_0 = \mathbf{x}_0$，$\psi_T = \mathbf{x}_T$ |
+| $\dot{\psi}_t$ | 条件速度，$:= \partial_t \psi_t$ |
+| $\mathbf{u}_t(\mathbf{x})$ | 边际目标速度，$:= \mathbb{E}[\dot{\psi}_t \mid \mathbf{X}_t = \mathbf{x}]$ |
+| $\rho(t)$ | 时间调度函数，$\rho(0)=0$，$\rho(T)=1$ |
+| $\mathbf{U}_t$ | 逐路径目标速度 |
+| $\mathcal{L}_{\text{CFM}}(\theta)$ | 条件流匹配损失 |
+| $\mathcal{L}_{\text{MFM}}(\theta)$ | 边际流匹配损失 |
+
+**整流流**
+
+| 符号 | 含义 |
+|------|------|
+| $\kappa(t)$ | 时间缩放因子，$:= \dot{\rho}(t)/(1-\rho(t))$ |
+| $\tilde{\mathbf{u}}_t(\mathbf{x})$ | 整流速度，$:= -(\mathbf{x} + \rho(t)\nabla_\mathbf{x}\log p_t(\mathbf{x}))$ |
+| $\tilde{\mathbf{u}}_t^\theta(\mathbf{x})$ | 实用整流速度，$= -(\mathbf{x} - \hat{\boldsymbol{\epsilon}}_\theta(\mathbf{x},t))$ |
+| $s(t)$ | 时间重参数化，$:= \int_0^t \kappa(\tau)\mathrm{d}\tau$ |
+| $\boldsymbol{\epsilon}^*(\mathbf{x}, t)$ | 贝叶斯最优噪声预测，$:= \mathbb{E}[\boldsymbol{\epsilon} \mid \mathbf{X}_t = \mathbf{x}]$ |
+
+**DDIM 与流匹配联系**
+
+| 符号 | 含义 |
+|------|------|
+| $\{\tau_k\}_{k=0}^K$ | 递减时间网格，$T = \tau_0 > \cdots > \tau_K = 0$ |
+| $\hat{\mathbf{x}}_0(\mathbf{x}_{\tau_k}, \tau_k)$ | 网格点的 $x_0$-预测 |
+| $\Delta s_k, h$ | 步长与最大步长 |
+| $L, C$ | Lipschitz 常数与全局误差常数 |
+| $w(t)$ | 时间加权函数 |
+
+#### 八、引导扩散（§6）
+
+**通用引导**
+
+| 符号 | 含义 |
+|------|------|
+| $\mathbf{c}$ | 条件变量（文本 prompt、类别标签等） |
+| $\lambda$ | 引导强度，$\lambda \geq 0$ |
+
+**分类器引导（§6.1）**
+
+| 符号 | 含义 |
+|------|------|
+| $p_\phi(y \mid \mathbf{x}_t, t)$ | 辅助分类器 |
+| $y$ | 目标类别标签 |
+| $\nabla_{\mathbf{x}_t}\log p_\phi(y \mid \mathbf{x}_t, t)$ | 分类器得分（引导梯度） |
+| $\bar{\mu}_\theta(\mathbf{x}_t, t \mid y)$ | 引导后均值，$= \mu_\theta + \lambda\sigma_t^2\nabla_{\mathbf{x}_t}\log p_\phi$ |
+
+**无分类器引导（§6.2）**
+
+| 符号 | 含义 |
+|------|------|
+| $\hat{\boldsymbol{\epsilon}}_{\text{uncond}}$ | 无条件噪声预测 |
+| $\hat{\boldsymbol{\epsilon}}_{\text{cond}}$ | 条件噪声预测 |
+| $\hat{\boldsymbol{\epsilon}}_\lambda$ | 混合预测，$= \hat{\boldsymbol{\epsilon}}_{\text{uncond}} + \lambda(\hat{\boldsymbol{\epsilon}}_{\text{cond}} - \hat{\boldsymbol{\epsilon}}_{\text{uncond}})$ |
+| $\Delta\hat{\boldsymbol{\epsilon}}$ | 引导增量，$:= \hat{\boldsymbol{\epsilon}}_{\text{cond}} - \hat{\boldsymbol{\epsilon}}_{\text{uncond}}$ |
+| $s_t^{(\lambda)}(\mathbf{x})$ | 引导后得分，$= (1-\lambda)s_t^{\text{uncond}} + \lambda s_t^{\text{cond}}$ |
+
+**引导调度与稳定性（§6.3-6.4）**
+
+| 符号 | 含义 |
+|------|------|
+| $\lambda_t$ | 时变引导强度 |
+| $\lambda_{\max}$ | 引导强度上限 |
+| $\sigma(u) = 1/(1+e^{-u})$ | sigmoid 函数 |
+| $a, b$ | 调度超参数（斜率、拐点） |
+| $\varepsilon$ | 数值稳定性常数 |
+
+**引导蒸馏（§6.5）**
+
+| 符号 | 含义 |
+|------|------|
+| $\hat{\mathbf{x}}_0^T, \hat{\mathbf{x}}_0^S$ | 教师/学生的 $x_0$-预测 |
+| $\lambda_T$ | 教师引导强度 |
+| $\mathcal{L}_{\text{distill}}$ | 蒸馏损失，$= \sum_k \mathbb{E}\|\hat{\mathbf{x}}_0^S - \hat{\mathbf{x}}_0^T\|^2$ |
+
+#### 九、核心关系速查
+
+| 关系 | 公式 | 含义 |
+|------|------|------|
+| 噪声-信号互补 | $\beta_t + \alpha_t = 1$ | 每步噪声与信号之和恒为 1 |
+| 累积递推 | $\bar{\alpha}_t = \alpha_t \cdot \bar{\alpha}_{t-1}$ | 信号随步数指数衰减 |
+| 前向一步到位 | $\mathbf{x}_t = \sqrt{\bar{\alpha}_t}\mathbf{x}_0 + \sqrt{1-\bar{\alpha}_t}\boldsymbol{\epsilon}$ | 无需逐步，直接采样任意 $t$ |
+| 反推 $\mathbf{x}_0$ | $\mathbf{x}_0 = \frac{1}{\sqrt{\bar{\alpha}_t}}(\mathbf{x}_t - \sqrt{1-\bar{\alpha}_t}\boldsymbol{\epsilon})$ | 已知噪声即可还原数据 |
+| 得分-噪声对偶 | $s_t(\mathbf{x}) = -\frac{1}{\sqrt{1-\bar{\alpha}_t}}\mathbb{E}[\boldsymbol{\epsilon}\mid\mathbf{X}_t = \mathbf{x}]$ | 得分等价于缩放的噪声条件期望 |
+| $\epsilon$-预测 $=$ 速度学习 | $\tilde{\mathbf{u}}_t^\theta = -(\mathbf{x} - \hat{\boldsymbol{\epsilon}}_\theta)$ | $\epsilon$-损失与整流速度损失等价 |
+| DDIM $=$ 流匹配 | 定理 5.16 | DDIM 更新即整流流 ODE 单步积分 |
+| 分类器 $\approx$ 无分类器引导 | §6.1 vs §6.2 | 均为逆向均值的一阶得分修正 |
+
 ---
 
 ## 2 预备知识
