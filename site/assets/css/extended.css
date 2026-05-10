@@ -1,0 +1,92 @@
+/* Chinese typography optimization */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.8;
+}
+
+.post-content {
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+}
+
+.post-content p {
+  margin-bottom: 1.2em;
+}
+
+/* Paper card component */
+.paper-card {
+  border-left: 3px solid var(--tertiary);
+  padding: 0.6em 1em;
+  margin: 0.8em 0;
+  background: var(--code-bg);
+  border-radius: 0 4px 4px 0;
+}
+
+.paper-card-title {
+  font-weight: 600;
+  font-size: 0.95em;
+  margin-bottom: 0.2em;
+}
+
+.paper-card-title a {
+  text-decoration: none;
+  color: var(--primary);
+}
+
+.paper-card-title a:hover {
+  text-decoration: underline;
+}
+
+.paper-card-meta {
+  font-size: 0.82em;
+  color: var(--secondary);
+  margin-bottom: 0.3em;
+}
+
+.paper-card-meta span {
+  margin-right: 0.5em;
+}
+
+.paper-card-desc {
+  font-size: 0.85em;
+  color: var(--secondary);
+  margin-top: 0.2em;
+}
+
+/* KaTeX display math spacing */
+.katex-display {
+  margin: 1.2em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Table styling */
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.post-content th,
+.post-content td {
+  padding: 0.5em 0.8em;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.post-content th {
+  background: var(--code-bg);
+  font-weight: 600;
+}
+
+/* Tighter heading spacing for Chinese */
+.post-content h2 {
+  margin-top: 2em;
+  margin-bottom: 0.8em;
+}
+
+.post-content h3 {
+  margin-top: 1.5em;
+  margin-bottom: 0.6em;
+}

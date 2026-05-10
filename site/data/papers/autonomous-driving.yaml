@@ -1,0 +1,126 @@
+# 扩散模型用于驾驶规划
+- title: "DiffusionDrive: Truncated Diffusion Model for End-to-End Autonomous Driving"
+  authors: "Liao et al."
+  year: 2025
+  venue: "CVPR 2025"
+  category: "扩散规划"
+
+- title: "DiffusionDriveV2"
+  authors: "Liao et al."
+  year: 2025
+  category: "扩散规划"
+
+- title: "RAD: Real-time Autonomous Driving Diffusion Planner"
+  authors: "2024"
+  category: "扩散规划"
+
+- title: "RAD-V2"
+  authors: "2025"
+  category: "扩散规划"
+
+- title: "BRIDGEDRIVE"
+  authors: "2024"
+  category: "扩散规划"
+
+- title: "CTG++: Controllable and Generalizable Diffusion-Based Traffic Generation"
+  authors: "Columbia"
+  year: 2024
+  category: "交通生成"
+
+- title: "MotionDiffuser: Controllable Multi-Agent Motion Prediction"
+  authors: "2023"
+  category: "运动预测"
+
+- title: "OccDiffusion: Multi-Camera 3D Occupancy Prediction"
+  authors: "2024"
+  category: "场景感知"
+
+- title: "LiDiff: Scaling Diffusion Models to Real-World 3D LiDAR Scene Completion"
+  authors: "2024"
+  category: "场景感知"
+
+- title: "MagicDrive: Street View Generation with Diverse 3D Geometry Control"
+  authors: "CUHK"
+  year: 2024
+  venue: "ICLR 2024"
+  category: "场景生成"
+
+- title: "UniSim: A Neural Closed-Loop Sensor Simulation"
+  authors: "Waabi"
+  year: 2023
+  venue: "CVPR 2023"
+  category: "仿真"
+
+# 世界模型
+- title: "GAIA-2: A Controllable Multi-View Generative World Model"
+  authors: "Wayve"
+  year: 2025
+  category: "世界模型-视频生成"
+
+- title: "DriveDreamer: Real-world-driven World Models for Autonomous Driving"
+  authors: "GigaAI"
+  year: 2024
+  venue: "ECCV 2024"
+  category: "世界模型-视频生成"
+
+- title: "GenAD: Generalized Predictive Model for Autonomous Driving"
+  authors: "NJU"
+  year: 2024
+  venue: "CVPR 2024"
+  category: "世界模型-视频生成"
+
+- title: "GAIA-1"
+  authors: "Wayve"
+  year: 2023
+  category: "世界模型-视频生成"
+
+- title: "Drive-WM"
+  authors: "Tsinghua"
+  year: 2024
+  venue: "CVPR 2024"
+  category: "世界模型-视频生成"
+
+- title: "OccWorld: 3D Occupancy World Model"
+  authors: "Tsinghua"
+  year: 2024
+  venue: "ECCV 2024"
+  category: "世界模型-3D占用"
+
+- title: "Copilot4D"
+  authors: "Waabi"
+  year: 2024
+  venue: "ICLR 2024"
+  category: "世界模型-3D占用"
+
+- title: "MILE"
+  authors: "Wayve"
+  year: 2022
+  venue: "NeurIPS 2022"
+  category: "世界模型-端到端集成"
+
+- title: "EMMA"
+  authors: "Waymo"
+  year: 2024
+  category: "世界模型-端到端集成"
+
+- title: "Cosmos"
+  authors: "NVIDIA"
+  year: 2025
+  category: "世界模型-基础模型"
+
+# 强化学习
+- title: "DreamerAD: World Model Based Autonomous Driving RL"
+  authors: "2024"
+  category: "强化学习"
+
+# NeRF/3DGS 用于驾驶
+- title: "EmerNeRF"
+  authors: "NVIDIA"
+  year: 2024
+  venue: "ICLR 2024"
+  category: "神经场景表示"
+
+- title: "Street Gaussians"
+  authors: "2024"
+  venue: "ECCV 2024"
+  category: "神经场景表示"

@@ -1,0 +1,21 @@
+services:
+  # Production: build and serve via nginx
+  site:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ../topics:/usr/share/nginx/html/papers:ro
+    restart: unless-stopped
+
+  # Development: Hugo dev server with hot reload
+  dev:
+    image: hugomods/hugo:exts-0.140.0
+    command: hugo server --bind 0.0.0.0 --baseURL http://localhost:1313 --disableFastRender
+    ports:
+      - "1313:1313"
+    volumes:
+      - .:/src
+    working_dir: /src
+    profiles:
+      - dev

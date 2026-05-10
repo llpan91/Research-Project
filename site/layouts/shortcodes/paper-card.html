@@ -1,0 +1,20 @@
+<div class="paper-card">
+  <div class="paper-card-title">
+    {{ if .Get "arxiv" }}
+      <a href="https://arxiv.org/abs/{{ .Get "arxiv" }}" target="_blank" rel="noopener">
+        {{ .Get "title" }}
+      </a>
+    {{ else }}
+      {{ .Get "title" }}
+    {{ end }}
+  </div>
+  <div class="paper-card-meta">
+    {{ with .Get "authors" }}<span class="paper-authors">{{ . }}</span>{{ end }}
+    {{ with .Get "year" }}<span class="paper-year">({{ . }})</span>{{ end }}
+    {{ with .Get "venue" }}<span class="paper-venue">{{ . }}</span>{{ end }}
+    {{ with .Get "arxiv" }}<span class="paper-arxiv">[<a href="https://arxiv.org/abs/{{ . }}" target="_blank" rel="noopener">arXiv</a>]</span>{{ end }}
+  </div>
+  {{ with .Get "description" }}
+  <div class="paper-card-desc">{{ . }}</div>
+  {{ end }}
+</div>
