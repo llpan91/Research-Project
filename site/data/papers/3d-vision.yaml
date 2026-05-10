@@ -1,0 +1,31 @@
+- title: "EgoVerse"
+  authors: "2024"
+  category: "自我中心视觉"
+
+- title: "3D Diffusion Policy: Generalizable Visuomotor Policy Learning via Simple 3D Representations"
+  authors: "2024"
+  category: "3D 策略学习"
+
+- title: "LiDiff: Scaling Diffusion Models to Real-World 3D LiDAR Scene Completion"
+  authors: "2024"
+  category: "3D 补全"
+
+- title: "SpatialVLA: Exploring Spatial Representations for Visual-Language-Action Model"
+  authors: "2025"
+  category: "空间智能"
+
+- title: "EmerNeRF: Emergent Scene Decomposition via Self-Supervision"
+  authors: "NVIDIA"
+  year: 2024
+  venue: "ICLR 2024"
+  category: "NeRF"
+
+- title: "Street Gaussians"
+  authors: "2024"
+  venue: "ECCV 2024"
+  category: "3D Gaussian Splatting"
+
+- title: "LiDAR4D"
+  authors: "2024"
+  venue: "CVPR 2024"
+  category: "4D 重建"

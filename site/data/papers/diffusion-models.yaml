@@ -1,0 +1,112 @@
+- title: "DDPM: Denoising Diffusion Probabilistic Models"
+  authors: "Ho, Jain, Abbeel"
+  year: 2020
+  arxiv: "2006.11239"
+  category: "理论基础"
+
+- title: "DDIM: Denoising Diffusion Implicit Models"
+  authors: "Song, Meng, Ermon"
+  year: 2020
+  arxiv: "2010.02502"
+  category: "理论基础"
+
+- title: "Score-Based Generative Modeling through SDEs"
+  authors: "Song, Sohl-Dickstein, Kingma, Kumar, Ermon, Poole"
+  year: 2021
+  arxiv: "2011.13456"
+  category: "理论基础"
+
+- title: "Classifier-Free Diffusion Guidance"
+  authors: "Ho, Salimans"
+  year: 2022
+  arxiv: "2207.12598"
+  category: "条件生成"
+
+- title: "Latent Diffusion Models (LDM)"
+  authors: "Rombach, Blattmann, Lorenz, Esser, Ommer"
+  year: 2022
+  arxiv: "2112.10752"
+  category: "条件生成"
+
+- title: "Consistency Models"
+  authors: "Song, Dhariwal, Chen, Sutskever"
+  year: 2023
+  arxiv: "2303.01469"
+  category: "加速采样"
+
+- title: "Flow Matching for Generative Modeling"
+  authors: "Lipman, Chen, Ben-Hamu, Nickel, Le"
+  year: 2023
+  arxiv: "2210.02747"
+  category: "加速采样"
+
+- title: "Diffusion Policy: Visuomotor Policy Learning via Action Diffusion"
+  authors: "Chi, Feng, Du, Xu, Cousineau, Burchfiel, Song"
+  year: 2023
+  arxiv: "2303.04137"
+  category: "决策应用"
+
+- title: "Planning with Diffusion for Flexible Behavior Synthesis (Diffuser)"
+  authors: "Janner, Du, Tenenbaum, Levine"
+  year: 2022
+  arxiv: "2205.09991"
+  category: "决策应用"
+
+- title: "Diffusion-QL: Diffusion Q-Learning"
+  authors: "Wang, Hunt, Zhou"
+  year: 2023
+  arxiv: "2208.06193"
+  category: "决策应用"
+
+- title: "IDQL: Implicit Diffusion Q-Learning"
+  authors: "Hansen-Estruch, Kostrikov, Janner, Kuba, Levine"
+  year: 2023
+  arxiv: "2304.10573"
+  category: "决策应用"
+
+- title: "Decision Diffuser"
+  authors: "Ajay, Du, Gupta, Tenenbaum, Jaakkola, Agrawal"
+  year: 2023
+  arxiv: "2211.15657"
+  category: "决策应用"
+
+- title: "DPPO: Diffusion Policy Policy Optimization"
+  authors: "Ren et al."
+  year: 2024
+  arxiv: "2409.00588"
+  category: "决策应用"
+
+- title: "Consistency Policy"
+  authors: "Prasad et al."
+  year: 2024
+  arxiv: "2405.07503"
+  category: "加速采样"
+
+- title: "UniSim: A Neural Closed-Loop Sensor Simulator"
+  authors: "Yang et al."
+  year: 2023
+  arxiv: "2310.06114"
+  category: "仿真"
+
+- title: "π0: Vision-Language-Action Flow Model"
+  authors: "Physical Intelligence"
+  year: 2024
+  arxiv: "2410.24164"
+  category: "决策应用"
+
+- title: "MotionDiffuser: Controllable Multi-Agent Motion Prediction"
+  authors: "Jiang et al."
+  year: 2023
+  arxiv: "2306.03083"
+  category: "运动预测"
+
+- title: "GenAug: Retargeting behaviors to unseen situations via data augmentation"
+  authors: "Chen et al."
+  year: 2023
+  arxiv: "2302.06671"
+  category: "数据增广"
+
+- title: "Diffusion Models: A Mathematical Introduction"
+  authors: "Calvin Luo"
+  year: 2022
+  category: "教材"

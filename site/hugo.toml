@@ -1,0 +1,95 @@
+baseURL = "https://example.com/"
+languageCode = "zh-cn"
+defaultContentLanguage = "zh"
+title = "Pan's Research Blog"
+theme = "PaperMod"
+paginate = 10
+enableRobotsTXT = true
+buildDrafts = false
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.goldmark.extensions]
+    [markup.goldmark.extensions.passthrough]
+      enable = true
+      [markup.goldmark.extensions.passthrough.delimiters]
+        block = [['$$', '$$'], ['\[', '\]']]
+        inline = [['$', '$'], ['\(', '\)']]
+  [markup.highlight]
+    style = "dracula"
+    lineNos = false
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
+
+[params]
+  env = "production"
+  description = "扩散模型 | 机器人操控 | 自动驾驶 | 3D视觉"
+  author = "Pan"
+  defaultTheme = "auto"
+  ShowReadingTime = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowToc = true
+  TocOpen = false
+  ShowShareButtons = false
+  comments = false
+
+  [params.homeInfoParams]
+    Title = "Hi, I'm Pan"
+    Content = """
+研究方向：扩散模型、机器人操控（UMI）、自动驾驶、3D视觉。\n
+这里记录我的研究笔记、论文阅读与项目实践。
+"""
+
+  [[params.socialIcons]]
+    name = "github"
+    url = "https://github.com/pan"
+
+  [[params.socialIcons]]
+    name = "email"
+    url = "mailto:pan@example.com"
+
+  [params.cover]
+    hidden = false
+    hiddenInList = false
+    hiddenInSingle = true
+
+  [params.fuseOpts]
+    isCaseSensitive = false
+    shouldSort = true
+    location = 0
+    distance = 1000
+    threshold = 0.4
+    minMatchCharLength = 0
+    keys = ["title", "permalink", "summary", "content"]
+
+[[menu.main]]
+  identifier = "research"
+  name = "Research"
+  url = "/research/"
+  weight = 10
+
+[[menu.main]]
+  identifier = "blog"
+  name = "Blog"
+  url = "/blog/"
+  weight = 20
+
+[[menu.main]]
+  identifier = "about"
+  name = "About"
+  url = "/about/"
+  weight = 30
+
+[[menu.main]]
+  identifier = "search"
+  name = "Search"
+  url = "/search/"
+  weight = 40
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]

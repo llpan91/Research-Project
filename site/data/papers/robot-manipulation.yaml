@@ -1,0 +1,164 @@
+# UMI 系列
+- title: "UMI: Universal Manipulation Interface"
+  authors: "Chi et al."
+  year: 2024
+  category: "UMI 核心"
+  subcategory: "UMI"
+
+- title: "UMI-FT: Fine-Tuning with Force/Torque Sensing"
+  authors: "2024"
+  category: "UMI 硬件扩展"
+  subcategory: "UMI"
+
+- title: "FastUMI: Simplified Hardware Design"
+  authors: "2024"
+  category: "UMI 硬件扩展"
+  subcategory: "UMI"
+
+- title: "FastUMI-100K: Large-Scale Data Collection"
+  authors: "2024"
+  category: "UMI 硬件扩展"
+  subcategory: "UMI"
+
+- title: "MV-UMI: Multi-View UMI"
+  authors: "2024"
+  category: "UMI 硬件扩展"
+  subcategory: "UMI"
+
+- title: "UMI-on-Air: Embodiment-Agnostic Visuomotor Policies"
+  authors: "2024"
+  category: "移动与全身扩展"
+  subcategory: "UMI"
+
+- title: "DexUMI: Human Hand as Universal Manipulation Interface"
+  authors: "2024"
+  category: "灵巧手与精细化操作"
+  subcategory: "UMI"
+
+- title: "exUMI: Extensible Robot Teaching System"
+  authors: "2024"
+  category: "UMI 硬件扩展"
+  subcategory: "UMI"
+
+- title: "FARM: Tactile-Conditioned Diffusion Policy"
+  authors: "2024"
+  category: "UMI 硬件扩展"
+  subcategory: "UMI"
+
+- title: "HoMMI: Learning Whole-Body Mobile Manipulation"
+  authors: "2024"
+  category: "移动与全身扩展"
+  subcategory: "UMI"
+
+- title: "TacUMI: Multi-Modal Universal Manipulation Interface"
+  authors: "2024"
+  category: "灵巧手与精细化操作"
+  subcategory: "UMI"
+
+- title: "UMIGen: Egocentric Point Cloud Generation"
+  authors: "2024"
+  category: "数据策略"
+  subcategory: "UMI"
+
+- title: "UMI on Legs: Mobile Manipulation with Whole-Body Controllers"
+  authors: "2024"
+  category: "移动与全身扩展"
+  subcategory: "UMI"
+
+- title: "ActiveUMI: Active Perception from Robot-Free Demonstrations"
+  authors: "2024"
+  category: "移动与全身扩展"
+  subcategory: "UMI"
+
+# VLA 系列
+- title: "π0: Vision-Language-Action Flow Model for General Robot Control"
+  authors: "Physical Intelligence"
+  year: 2024
+  arxiv: "2410.24164"
+  category: "VLA"
+  subcategory: "Physical Intelligence"
+
+- title: "π0.5"
+  authors: "Physical Intelligence"
+  year: 2025
+  category: "VLA"
+  subcategory: "Physical Intelligence"
+
+- title: "π0-FAST"
+  authors: "Physical Intelligence"
+  year: 2025
+  category: "VLA"
+  subcategory: "Physical Intelligence"
+
+- title: "FAST: Efficient Action Tokenization"
+  authors: "Physical Intelligence"
+  year: 2025
+  category: "VLA"
+  subcategory: "Physical Intelligence"
+
+- title: "CogACT"
+  authors: "2025"
+  category: "VLA 改进"
+  subcategory: "VLA Extensions"
+
+- title: "DexGraspVLA"
+  authors: "2025"
+  category: "VLA 改进"
+  subcategory: "VLA Extensions"
+
+- title: "HybridVLA"
+  authors: "2025"
+  category: "VLA 改进"
+  subcategory: "VLA Extensions"
+
+- title: "OpenVLA-OFT"
+  authors: "2025"
+  category: "VLA 改进"
+  subcategory: "VLA Extensions"
+
+- title: "SpatialVLA"
+  authors: "2025"
+  category: "VLA 改进"
+  subcategory: "VLA Extensions"
+
+# Diffusion Policy 相关
+- title: "Diffusion Policy: Visuomotor Policy Learning via Action Diffusion"
+  authors: "Chi et al."
+  year: 2023
+  arxiv: "2303.04137"
+  category: "策略框架"
+  subcategory: "Diffusion Policy"
+
+- title: "3D Diffusion Policy: Generalizable Visuomotor Policy Learning"
+  authors: "2024"
+  category: "策略框架"
+  subcategory: "Diffusion Policy"
+
+- title: "Planning with Diffusion for Flexible Behavior Synthesis"
+  authors: "Janner et al."
+  year: 2022
+  arxiv: "2205.09991"
+  category: "策略框架"
+  subcategory: "Diffusion Policy"
+
+# 相关系统
+- title: "ALOHA: Learning Fine-Grained Bimanual Manipulation"
+  authors: "Zhao et al."
+  year: 2023
+  category: "相关系统"
+  subcategory: "其他"
+
+- title: "Mobile ALOHA: Bimanual Mobile Manipulation"
+  authors: "2024"
+  category: "相关系统"
+  subcategory: "其他"
+
+- title: "MimicGen: Scalable Robot Learning using Human Demonstrations"
+  authors: "2024"
+  category: "数据增广"
+  subcategory: "基础设施"
+
+- title: "RoboVerse: Unified Platform for Scalable Robot Learning"
+  authors: "2024"
+  category: "仿真平台"
+  subcategory: "基础设施"
