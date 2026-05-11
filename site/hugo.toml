@@ -47,11 +47,11 @@ buildDrafts = false
 
   [[params.socialIcons]]
     name = "github"
-    url = "https://github.com/pan"
+    url = "https://github.com/llpan91"
 
   [[params.socialIcons]]
     name = "email"
-    url = "mailto:pan@example.com"
+    url = "mailto:ll.pan931204@gmail.com"
 
   [params.cover]
     hidden = false
