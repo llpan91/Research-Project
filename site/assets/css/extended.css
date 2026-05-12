@@ -59,6 +59,24 @@ body {
   margin: 1.2em 0;
   overflow-x: auto;
   overflow-y: hidden;
+  padding: 0.5em 0;
+}
+
+/* Prevent equation tag overlapping with formula content */
+.katex-display > .katex > .katex-html > .tag {
+  position: relative;
+  float: right;
+  margin-left: 1em;
+}
+
+.katex-display .katex {
+  max-width: 100%;
+  padding-right: 3.5em;
+}
+
+.katex-display > .katex > .katex-html {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 /* Table styling */
