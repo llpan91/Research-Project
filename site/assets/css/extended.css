@@ -54,7 +54,7 @@ body {
   margin-top: 0.2em;
 }
 
-/* KaTeX display math spacing */
+/* KaTeX display math */
 .katex-display {
   margin: 1.2em 0;
   overflow-x: auto;
@@ -62,21 +62,19 @@ body {
   padding: 0.5em 0;
 }
 
-/* Prevent equation tag overlapping with formula content */
-.katex-display > .katex > .katex-html > .tag {
-  position: relative;
-  float: right;
-  margin-left: 1em;
-}
-
-.katex-display .katex {
-  max-width: 100%;
-  padding-right: 3.5em;
-}
-
+/* Fix equation tag overlapping: use flexbox instead of absolute positioning */
 .katex-display > .katex > .katex-html {
-  max-width: 100%;
-  overflow-x: auto;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: baseline;
+  width: 100%;
+}
+
+.katex-display > .katex > .katex-html > .tag {
+  position: static;
+  margin-left: 1em;
+  flex-shrink: 0;
 }
 
 /* Table styling */
